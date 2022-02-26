@@ -25,6 +25,10 @@ from .time_util import sleep
 from selenium.common.exceptions import WebDriverException
 from selenium.common.exceptions import UnexpectedAlertPresentException
 
+# importação personalizada 
+from platform import system
+OS_NAME = system()
+
 
 def get_geckodriver():
     # prefer using geckodriver from path
@@ -120,13 +124,20 @@ def set_selenium_local_session(
 
     # prefer user path before downloaded one
     driver_path = geckodriver_path or get_geckodriver()
-    browser = webdriver.Firefox(
-        firefox_profile=firefox_profile,
-        executable_path=driver_path,
-        log_path=geckodriver_log,
-        options=firefox_options,
-    )
-
+    if OS_NAME == 'Windows':
+        browser = webdriver.Firefox(
+            firefox_profile=firefox_profile,
+            executable_path=driver_path,
+            log_path=geckodriver_log,
+            options=firefox_options,
+        )
+    elif OS_NAME == "Linux":
+        browser = webdriver.Firefox(
+            firefox_profile=firefox_profile,
+            #executable_path=driver_path,
+            log_path=geckodriver_log,
+            options=firefox_options,
+        )
     # add extension to hide selenium
     browser.install_addon(create_firefox_extension(), temporary=True)
 
