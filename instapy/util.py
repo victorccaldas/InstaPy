@@ -66,7 +66,6 @@ default_profile_pic_instagram = [
 
 next_screenshot = 1
 
-
 def is_private_profile(browser, logger, following=True):
     """
     Verify if account is Private
@@ -76,27 +75,20 @@ def is_private_profile(browser, logger, following=True):
     :param following: Not accessed
     :return: None if profile cannot be verified
     """
-
+    is_private=None
     try:
-        # Get profile owner information
-        shared_data = get_shared_data(browser)
-
-        # Sometimes shared_data["entry_data"]["ProfilePage"][0] is empty, but get_additional_data()
-        # fetches all data needed
-        get_key = shared_data.get("entry_data").get("ProfilePage")
-
-        if get_key:
-            data = get_key[0]
-        else:
-            data = get_additional_data(browser)
-    finally:
-        is_private = data["graphql"]["user"]["is_private"]
-
+        #DEF: 22jan function refactored
+        data = get_additional_data(browser)
+        is_private = data["items"][0]
+        is_private = is_private["user"]['is_private'] if is_private else None
         logger.info(
             "Checked if '{}' is private, and it is: '{}'".format(
-                data["graphql"]["user"]["username"], is_private
+                data["items"][0]["user"]["username"], is_private
             )
         )
+    except:
+        logger.info("Cannot find is_private so defined as None")
+        is_private=None
 
     return is_private
 
@@ -156,7 +148,6 @@ def validate_username(
     logfolder,
 ):
     """Check if we can interact with the user"""
-
     # some features may not provide `username` and in those cases we will
     # get it from post's page.
     if "/" in username_or_link:
@@ -168,9 +159,11 @@ def validate_username(
         web_address_navigator(browser, link)
 
         try:
+            #todo: check if this section works
+            #old "PostPage[0].graphql.shortcode_media.owner.username"
             username = browser.execute_script(
                 "return window._sharedData.entry_data."
-                "PostPage[0].graphql.shortcode_media.owner.username"
+                "PostPage[0].items[0].user.username"
             )
 
         except WebDriverException:
@@ -178,9 +171,11 @@ def validate_username(
                 browser.execute_script("location.reload()")
                 update_activity(browser, state=None)
 
+                #todo: check if this section works
+                #old "PostPage[0].graphql.shortcode_media.owner.username"
                 username = browser.execute_script(
                     "return window._sharedData.entry_data."
-                    "PostPage[0].graphql.shortcode_media.owner.username"
+                    "PostPage[0].items[0].user.username"
                 )
 
             except WebDriverException:
@@ -265,7 +260,7 @@ def validate_username(
                 else "unknown",
             )
         )
-
+        
         if followers_count or following_count:
             if potency_ratio and not delimit_by_numbers:
                 if relationship_ratio and relationship_ratio < potency_ratio:
@@ -496,7 +491,6 @@ def getUserData(
 ):
     shared_data = get_shared_data(browser)
 
-    # Sometimes shared_data["entry_data"]["ProfilePage"][0] is empty, but get_additional_data()
     # fetches all data needed
     get_key = shared_data.get("entry_data").get("ProfilePage")
 
@@ -520,7 +514,15 @@ def getMediaData(
     browser,
 ):
     additional_data = get_additional_data(browser)
-    data = additional_data["graphql"]["shortcode_media"]
+    #DEF: 20jan
+    data = additional_data["items"][0]
+   
+    #todo: remove rewrite query by modifing call to getMediaData functions in other files
+    if query=="comments_disabled": query="comment_likes_enabled"
+    if query=="edge_media_to_parent_comment": query="comments"
+    if query=="edge_media_to_parent_comment.count": query="comment_count"
+    if query=="edge_media_preview_comment": query="preview_comments"
+    if query=="edge_media_preview_comment.count": query="comment_count"
 
     if query.find(".") == -1:
         data = data[query]
@@ -2485,8 +2487,11 @@ def get_cord_location(browser, location):
     ).text
     data = json.loads(json_text)
 
-    lat = data["graphql"]["location"]["lat"]
-    lon = data["graphql"]["location"]["lng"]
+    #DEF: 22jan
+    lat = lon = ""
+    if "location" in data["items"][0]:
+     lat = data["items"][0]["location"]["lat"]
+     lon = data["items"][0]["location"]["lng"]
 
     return lat, lon
 

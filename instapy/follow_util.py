@@ -23,73 +23,84 @@ def get_following_status(
     browser, track, username, person, person_id, logger, logfolder
 ):
     """Verify if you are following the user in the loaded page"""
-    if person == username:
-        return "OWNER", None
+    follow_button_error = 0 
+    while True:
+        if person == username:
+            return "OWNER", None
 
-    if track == "profile":
-        ig_homepage = "https://www.instagram.com/"
-        web_address_navigator(browser, ig_homepage + person)
-
-    follow_button_XP = read_xpath(get_following_status.__name__, "follow_button_XP")
-    failure_msg = "--> Unable to detect the following status of '{}'!"
-    user_inaccessible_msg = (
-        "Couldn't access the profile page of '{}'!\t~might have changed the"
-        " username".format(person)
-    )
-
-    # check if the page is available
-    valid_page = is_page_available(browser, logger)
-    if not valid_page:
-        logger.warning(user_inaccessible_msg)
-        person_new = verify_username_by_id(
-            browser, username, person, None, logger, logfolder
-        )
-        if person_new:
+        if track == "profile":
             ig_homepage = "https://www.instagram.com/"
-            web_address_navigator(browser, ig_homepage + person_new)
-            valid_page = is_page_available(browser, logger)
-            if not valid_page:
-                logger.error(failure_msg.format(person_new.encode("utf-8")))
-                return "UNAVAILABLE", None
-        else:
-            logger.error(failure_msg.format(person.encode("utf-8")))
-            return "UNAVAILABLE", None
+            web_address_navigator(browser, ig_homepage + person)
 
-    # wait until the follow button is located and visible, then get it
-    try:
-        browser.find_element(
-            By.XPATH, read_xpath(get_following_status.__name__, "follow_button_XP")
-        )
         follow_button_XP = read_xpath(get_following_status.__name__, "follow_button_XP")
-    except NoSuchElementException:
-        try:
-            follow_button = browser.find_element(
-                By.XPATH,
-                read_xpath(get_following_status.__name__, "follow_span_XP_following"),
-            )
-            return "Following", follow_button
-        except:
-            return "UNAVAILABLE", None
-    follow_button = explicit_wait(
-        browser, "VOEL", [follow_button_XP, "XPath"], logger, 7, False
-    )
-
-    if not follow_button:
-        browser.execute_script("location.reload()")
-        update_activity(browser, state=None)
-        sleep(randint(1, 5))
-
-        follow_button = explicit_wait(
-            browser, "VOEL", [follow_button_XP, "XPath"], logger, 14, False
+        failure_msg = "--> Unable to detect the following status of '{}'!"
+        user_inaccessible_msg = (
+            "Couldn't access the profile page of '{}'!\t~might have changed the"
+            " username".format(person)
         )
+
+        # check if the page is available
+        valid_page = is_page_available(browser, logger)
+        if not valid_page:
+            logger.warning(user_inaccessible_msg)
+            person_new = verify_username_by_id(
+                browser, username, person, None, logger, logfolder
+            )
+            if person_new:
+                ig_homepage = "https://www.instagram.com/"
+                web_address_navigator(browser, ig_homepage + person_new)
+                valid_page = is_page_available(browser, logger)
+                if not valid_page:
+                    logger.error(failure_msg.format(person_new.encode("utf-8")))
+                    return "UNAVAILABLE", None
+            else:
+                logger.error(failure_msg.format(person.encode("utf-8")))
+                return "UNAVAILABLE", None
+
+        # wait until the follow button is located and visible, then get it
+        try:
+            browser.find_element(
+                By.XPATH, read_xpath(get_following_status.__name__, "follow_button_XP")
+            )
+            follow_button_XP = read_xpath(get_following_status.__name__, "follow_button_XP")
+        except NoSuchElementException:
+            try:
+                follow_button = browser.find_element(
+                    By.XPATH,
+                    read_xpath(get_following_status.__name__, "follow_span_XP_following"),
+                )
+                return "Following", follow_button
+            except:
+                return "UNAVAILABLE", None
+        follow_button = explicit_wait(
+            browser, "VOEL", [follow_button_XP, "XPath"], logger, 7, False
+        )
+
         if not follow_button:
-            # cannot find the any of the expected buttons
-            logger.error(failure_msg.format(person.encode("utf-8")))
-            return None, None
+            browser.execute_script("location.reload()")
+            update_activity(browser, state=None)
+            sleep(randint(5, 10))
 
-    # get follow status
-    following_status = follow_button.text
+            follow_button = explicit_wait(
+                browser, "VOEL", [follow_button_XP, "XPath"], logger, 14, False
+            )
+            if not follow_button:
+                # cannot find the any of the expected buttons
+                logger.error(failure_msg.format(person.encode("utf-8")))
+                return None, None
 
+        # get follow status
+        try:
+            following_status = follow_button.text
+            break
+        except Exception as e:
+            # tentar novamente
+            follow_button_error += 1
+            if follow_button_error > 3:
+                print("follow_button_error 3x seguidas: Permitindo o erro acontecer..")
+                raise e
+    if follow_button_error > 0:
+        logger.info("Erro corrigido :) precisou de {} tentativas.".format(follow_button_error+1))
     return following_status, follow_button
 
 
