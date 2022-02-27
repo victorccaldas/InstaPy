@@ -1504,6 +1504,7 @@ def verify_action(
     # currently supported actions are follow & unfollow
 
     retry_count = 0
+    else_trys = 0
     post_action_text_fail = None
     post_action_text_correct = None
 
@@ -1521,7 +1522,6 @@ def verify_action(
             post_action_text_fail = ["Following", "Requested", "Message"]
 
         while True:
-
             # count retries at beginning
             retry_count += 1
 
@@ -1543,41 +1543,48 @@ def verify_action(
             if button_change:
                 break
             else:
-                if retry_count == 1:
-                    reload_webpage(browser)
-                    sleep(4)
+                try:
+                    if retry_count == 1:
+                        reload_webpage(browser)
+                        sleep(4)
 
-                elif retry_count == 2:
-                    # handle it!
-                    # try to do the action one more time!
-                    click_visibly(browser, follow_button)
+                    elif retry_count == 2:
+                        # handle it!
+                        # try to do the action one more time!
+                        click_visibly(browser, follow_button)
 
-                    if action == "unfollow":
-                        confirm_unfollow(browser)
+                        if action == "unfollow":
+                            confirm_unfollow(browser)
 
-                    sleep(4)
-                elif retry_count == 3:
-                    user_link = "https://www.instagram.com/{}/".format(person)
-                    web_address_navigator(browser, user_link)
-                    follow_button_xp = read_xpath(
-                        "get_following_status", "follow_button_XP"
-                    )
-                    button = browser.find_element(By.XPATH, follow_button_xp)
-                    try:
-                        button.click()
-                    except:
-                        return False, "unexpected"
-                    sleep(random.randint(4, 7))
-                    return True, "success"
+                        sleep(4)
+                    elif retry_count == 3:
+                        user_link = "https://www.instagram.com/{}/".format(person)
+                        web_address_navigator(browser, user_link)
+                        follow_button_xp = read_xpath(
+                            "get_following_status", "follow_button_XP"
+                        )
+                        button = browser.find_element(By.XPATH, follow_button_xp)
+                        try:
+                            button.click()
+                        except:
+                            return False, "unexpected"
+                        sleep(random.randint(4, 7))
+                        return True, "success"
 
-                elif retry_count == 4:
-                    logger.warning(
-                        "Last {0} is not verified."
-                        "\t~'{1}' might be temporarily blocked "
-                        "from {0}ing\n".format(action, username)
-                    )
-                    sleep(210)
-                    return False, "temporary block"
+                    elif retry_count == 4:
+                        logger.warning(
+                            "Last {0} is not verified."
+                            "\t~'{1}' might be temporarily blocked "
+                            "from {0}ing\n".format(action, username)
+                        )
+                        sleep(210)
+                        return False, "temporary block"
+                except Exception as e:
+                    else_trys +=1
+                    if else_trys > 3:
+                        print("Deixando exceção ocorrer...")
+                        raise e
+
 
         logger.info("Last {} is verified after reloading the page!".format(action))
 
