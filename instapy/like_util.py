@@ -830,6 +830,9 @@ def verify_liked_image(browser, logger):
         return True
     else:
         logger.warning("--> Image was NOT liked! You have a BLOCK on likes!")
+        print("Debug: tirando screenshot...")
+        pth = browser.save_screenshot("screenshot_debug_likeblock.png")
+        print('path? : ', pth)
         return False
 
 

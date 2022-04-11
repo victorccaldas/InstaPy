@@ -822,11 +822,12 @@ def get_users_through_dialog_with_graphql(
         random.shuffle(followers_list)
 
     # get real amount
-    followers_list = random.sample(followers_list, real_amount)
+    #followers_list = random.sample(followers_list, real_amount)
+    followers_list = random.sample(followers_list, min(followers_list, real_amount)) # Debug do "Sample larger than population or is negative"
 
     for i, user in enumerate(followers_list):
         logger.info(
-            "To be followed: [{}/{}/{}]".format(i + 1, len(followers_list), user)
+            "To be followed: [{}/{} : {}]".format(i + 1, len(followers_list), user)
         )
 
     return followers_list, []
@@ -980,11 +981,12 @@ def get_given_user_followers(
 
     elif allfollowers < amount:
         logger.warning(
-            "'{}' has less followers- {}, than the given amount of {}".format(
+            "'{}' has less followers ( {} ), than the given amount of {}".format(
                 user_name, allfollowers, amount
             )
         )
-
+        # raise aqui ? pra dar erro no instapy ai "skipping to next user"
+        
     # locate element to user's followers
     try:
         followers_link = browser.find_element(
