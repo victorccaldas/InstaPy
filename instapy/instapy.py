@@ -3162,7 +3162,7 @@ class InstaPy:
                     continue
 
                 else:
-                    Instapy.get_error(self, err)
+                    InstaPy.get_error(self, err)
 
             print("")
             self.logger.info(
@@ -3349,7 +3349,7 @@ class InstaPy:
                     continue
 
                 else:
-                    Instapy.get_error(self, err)
+                    InstaPy.get_error(self, err)
 
             print("")
             self.logger.info(
@@ -3526,7 +3526,7 @@ class InstaPy:
                     continue
 
                 else:
-                    Instapy.get_error(self, err)
+                    InstaPy.get_error(self, err)
 
             print("")
             self.logger.info(
@@ -3699,7 +3699,7 @@ class InstaPy:
                     continue
 
                 else:
-                    Instapy.get_error(self, err)
+                    InstaPy.get_error(self, err)
 
             print("")
             self.logger.info(
@@ -3883,7 +3883,7 @@ class InstaPy:
                     continue
 
                 else:
-                    Instapy.get_error(self, err)
+                    InstaPy.get_error(self, err)
 
             print("")
             self.logger.info(
@@ -4071,7 +4071,7 @@ class InstaPy:
                 return self
 
             else:
-                Instapy.get_error(self, err)
+                InstaPy.get_error(self, err)
 
         return self
 

@@ -79,10 +79,12 @@ def set_selenium_local_session(
 
     firefox_options = Firefox_Options()
 
+    # Debug!!
     #firefox_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     #firefox_options.add_experimental_option('excludeSwitches', ['enable-logging'])
     firefox_options.add_argument('--disable-blink-features=AutomationControlled')
-
+    ####
+    
     if headless_browser:
         firefox_options.add_argument("-headless")
 
