@@ -345,6 +345,14 @@ class InstaPy:
             if len(err_msg) > 0:
                 raise InstaPyError(err_msg)
 
+    def get_error(self, err):
+        # Debug pra encontrar local do erro.
+        self.logger.error("Sorry, an error occurred: {}".format(err))
+        self.aborting = True
+        raise err
+        #return self
+
+
     def get_instapy_logger(self, show_logs: bool, log_handler=None):
         """
         Handles the creation and retrieval of loggers to avoid
@@ -3072,9 +3080,8 @@ class InstaPy:
             self.logger.info(tags)
             self.like_by_tags(tags, amount, media)
         except TypeError as err:
-            self.logger.error("Sorry, an error occurred: {}".format(err))
-            self.aborting = True
-            return self
+            return get_error(self, err)
+            
 
         return self
 
@@ -3155,9 +3162,7 @@ class InstaPy:
                     continue
 
                 else:
-                    self.logger.error("Sorry, an error occurred: {}".format(err))
-                    self.aborting = True
-                    return self
+                    Instapy.get_error(self, err)
 
             print("")
             self.logger.info(
@@ -3344,9 +3349,7 @@ class InstaPy:
                     continue
 
                 else:
-                    self.logger.error("Sorry, an error occurred: {}".format(err))
-                    self.aborting = True
-                    return self
+                    Instapy.get_error(self, err)
 
             print("")
             self.logger.info(
@@ -3523,9 +3526,7 @@ class InstaPy:
                     continue
 
                 else:
-                    self.logger.error("Sorry, an error occurred: {}".format(err))
-                    self.aborting = True
-                    return self
+                    Instapy.get_error(self, err)
 
             print("")
             self.logger.info(
@@ -3698,9 +3699,7 @@ class InstaPy:
                     continue
 
                 else:
-                    self.logger.error("Sorry, an error occurred: {}".format(err))
-                    self.aborting = True
-                    return self
+                    Instapy.get_error(self, err)
 
             print("")
             self.logger.info(
@@ -3884,9 +3883,7 @@ class InstaPy:
                     continue
 
                 else:
-                    self.logger.error("Sorry, an error occurred: {}".format(err))
-                    self.aborting = True
-                    return self
+                    Instapy.get_error(self, err)
 
             print("")
             self.logger.info(
@@ -4074,9 +4071,7 @@ class InstaPy:
                 return self
 
             else:
-                self.logger.error("Sorry, an error occurred: {}".format(exc))
-                self.aborting = True
-                return self
+                Instapy.get_error(self, err)
 
         return self
 
