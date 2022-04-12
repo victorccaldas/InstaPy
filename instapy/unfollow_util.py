@@ -823,7 +823,7 @@ def get_users_through_dialog_with_graphql(
 
     # get real amount
     #followers_list = random.sample(followers_list, real_amount)
-    followers_list = random.sample(followers_list, min(followers_list, real_amount)) # Debug do "Sample larger than population or is negative"
+    followers_list = random.sample(followers_list, min(len(followers_list), real_amount)) # Debug do "Sample larger than population or is negative"
 
     for i, user in enumerate(followers_list):
         logger.info(
