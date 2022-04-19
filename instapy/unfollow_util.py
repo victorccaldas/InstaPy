@@ -50,6 +50,7 @@ from .util import (
     web_address_navigator,
 )
 from .xpath import read_xpath
+from .minhas_funcoes import verificar_challenge
 
 
 def set_automated_followed_pool(
@@ -410,6 +411,8 @@ def unfollow(
                             unfollow_num + 1, amount, person.encode("utf-8")
                         )
                     )
+
+                    verificar_challenge(browser.current_url)
 
                     person_id = (
                         automatedFollowedPool["all"][person]["id"]

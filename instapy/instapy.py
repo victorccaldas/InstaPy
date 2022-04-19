@@ -103,6 +103,9 @@ from .util import (
 )
 from .xpath import read_xpath
 
+from .minhas_funcoes import verificar_challenge
+
+
 
 class InstaPy:
     """Class to be instantiated to use the script"""
@@ -1543,6 +1546,8 @@ class InstaPy:
                 self.logger.info("Like# [{}/{}]".format(i + 1, len(links)))
                 self.logger.info(link)
 
+                verificar_challenge(self.browser.current_url)
+
                 try:
                     inappropriate, user_name, is_video, reason, scope = check_link(
                         self.browser,
@@ -1558,6 +1563,7 @@ class InstaPy:
                     )
 
                     if not inappropriate and self.delimit_liking:
+
                         self.liking_approved = verify_liking(
                             self.browser, self.max_likes, self.min_likes, self.logger
                         )

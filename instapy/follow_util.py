@@ -71,7 +71,16 @@ def get_following_status(
                 )
                 return "Following", follow_button
             except:
+                pass
+            try:
+                follow_button = browser.find_element(
+                    By.XPATH,
+                    read_xpath(get_following_status.__name__, "follow_svg_XP_following"),
+                )
+                return "Following", follow_button
+            except:
                 return "UNAVAILABLE", None
+
         follow_button = explicit_wait(
             browser, "VOEL", [follow_button_XP, "XPath"], logger, 7, False
         )
