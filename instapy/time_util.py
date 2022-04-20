@@ -4,7 +4,7 @@ from datetime import datetime
 from random import gauss
 from random import uniform
 
-from .instapy import logger
+from . import instapy
 
 # Amount of variance to be introduced
 # i.e. random time will be in the range: TIME +/- STDEV %
@@ -34,7 +34,7 @@ def sleep(t, custom_percentage=None):
     if custom_percentage is None:
         custom_percentage = sleep_percentage
     time = randomize_time(t) * custom_percentage
-    logger.info("Sleeping about ~{}".format(time))
+    instapy.logger.info("Sleeping about ~{}".format(time))
     original_sleep(time)
 
 
