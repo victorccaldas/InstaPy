@@ -1965,13 +1965,14 @@ def is_page_available(browser, logger):
         if any(keyword in page_title for keyword in expected_keywords):
             if "Page Not Found" in page_title:
                 logger.warning(
-                    "The page isn't available!\t~the link may be broken, "
-                    "or the page may have been removed..."
+                    "The page isn't available!\t~the link may be broken, or the page may have been removed..."
+                    f"{browser.current_url}"
                 )
 
             elif "Content Unavailable" in page_title:
                 logger.warning(
                     "The page isn't available!\t~the user may have blocked you..."
+                    f"{browser.current_url}"
                 )
 
             return False

@@ -9,6 +9,6 @@ def verificar_challenge(url):
 
 
     # clicar no botão de email (ou sms?)
-    # email = automatizável
-    # sms = mais rápido pro Ramos responder
+    # email = automatizável porém exige credenciais
+    # sms = mais rápido pra ser respondido manualmente
         
