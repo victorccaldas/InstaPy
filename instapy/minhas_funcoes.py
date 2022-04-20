@@ -1,4 +1,5 @@
 def verificar_challenge(url):
+    print('Verificando challenge')
     if not '/challenge' in url:
         return
     

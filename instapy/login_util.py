@@ -160,61 +160,68 @@ def bypass_suspicious_login(
 
 
 def check_browser(browser, logfolder, logger, proxy_address):
-    # set initial state to offline
-    update_activity(
-        browser,
-        action=None,
-        state="trying to connect",
-        logfolder=logfolder,
-        logger=logger,
-    )
-
-    # check connection status
-    try:
-        logger.info("-- Connection Checklist [1/2] (Internet Connection Status)")
-        browser.get("view-source:https://freegeoip.app/json")
-        pre = browser.find_element(By.TAG_NAME, "pre").text
-        current_ip_info = json.loads(pre)
-        if (
-            proxy_address is not None
-            and socket.gethostbyname(proxy_address) != current_ip_info["ip"]
-        ):
-            logger.warning("- Proxy is set, but it's not working properly")
-            logger.warning(
-                '- Expected Proxy IP is "{}", and the current IP is "{}"'.format(
-                    proxy_address, current_ip_info["ip"]
-                )
-            )
-            logger.warning("- Try again or disable the Proxy Address on your setup")
-            logger.warning("- Aborting connection...")
-            return False
-        else:
-            logger.info("- Internet Connection Status: ok")
-            logger.info(
-                '- Current IP is "{}" and it\'s from "{}/{}"'.format(
-                    current_ip_info["ip"],
-                    current_ip_info["country_name"],
-                    current_ip_info["country_code"],
-                )
-            )
-            update_activity(
-                browser,
-                action=None,
-                state="Internet connection is ok",
-                logfolder=logfolder,
-                logger=logger,
-            )
-    except Exception:
-        logger.warning("- Internet Connection Status: error")
+    # Tenta conectar 3 vezes
+    for _testConnection in range(3):
+        # set initial state to offline
         update_activity(
             browser,
             action=None,
-            state="There is an issue with the internet connection",
+            state="trying to connect",
             logfolder=logfolder,
             logger=logger,
         )
-        return False
 
+        # check connection status
+        try:
+            logger.info("-- Connection Checklist [1/2] (Internet Connection Status)")
+            browser.get("view-source:https://freegeoip.app/json")
+            pre = browser.find_element(By.TAG_NAME, "pre").text
+            current_ip_info = json.loads(pre)
+            if (
+                proxy_address is not None
+                and socket.gethostbyname(proxy_address) != current_ip_info["ip"]
+            ):
+                logger.warning("- Proxy is set, but it's not working properly")
+                logger.warning(
+                    '- Expected Proxy IP is "{}", and the current IP is "{}"'.format(
+                        proxy_address, current_ip_info["ip"]
+                    )
+                )
+                logger.warning("- Try again or disable the Proxy Address on your setup")
+                logger.warning("- Aborting connection...")
+                return False
+            else:
+                logger.info("- Internet Connection Status: ok")
+                logger.info(
+                    '- Current IP is "{}" and it\'s from "{}/{}"'.format(
+                        current_ip_info["ip"],
+                        current_ip_info["country_name"],
+                        current_ip_info["country_code"],
+                    )
+                )
+                update_activity(
+                    browser,
+                    action=None,
+                    state="Internet connection is ok",
+                    logfolder=logfolder,
+                    logger=logger,
+                )
+                break
+        except Exception:
+            logger.warning("- Internet Connection Status: error")
+            update_activity(
+                browser,
+                action=None,
+                state="There is an issue with the internet connection",
+                logfolder=logfolder,
+                logger=logger,
+            )
+            if _testConnection == 2:
+                logger.error("- Could not connect to Instagram. Aborting...")
+                return False
+            print("Tentando reconectar...")
+            sleep(30)
+            
     # check if hide-selenium extension is running
     logger.info("-- Connection Checklist [2/2] (Hide Selenium Extension)")
     webdriver = browser.execute_script("return window.navigator.webdriver")
