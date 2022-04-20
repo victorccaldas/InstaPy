@@ -100,8 +100,7 @@ xpath["get_following_status"] = {
                                       text()='Follow' or \
                                       text()='Follow Back' or \
                                       text()='Unblock' and not(ancestor::*/@role = 'presentation')]",
-    "follow_span_XP_following": "//button/div/div/span[@aria-label='Following']",
-    "follow_svg_XP_following": "//button/div/div/svg[@aria-label='Following']",
+    "follow_span_XP_following": "//*[@aria-label='Following']",
 }
 
 xpath["get_follow_requests"] = {
