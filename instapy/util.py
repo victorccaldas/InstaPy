@@ -1182,6 +1182,7 @@ def get_relationship_counts(browser, username, logger):
     # check URL of the webpage, if it already is user's profile page,
     # then do not navigate to it again
     web_address_navigator(browser, user_link)
+    is_page_available(browser, logger)
 
     try:
         followers_count = browser.execute_script(
@@ -1968,6 +1969,19 @@ def is_page_available(browser, logger):
                     "The page isn't available!\t~the link may be broken, or the page may have been removed..."
                     f"{browser.current_url}"
                 )
+
+                try:
+                    browser.find_element(
+                    By.XPATH, read_xpath("page_errors", "inexistent"))
+                    print("Essa página não existe mais!")
+                except:
+                    try:
+                        browser.find_element(
+                        By.XPATH, read_xpath("page_errors", "instaBlock"))
+                        print("Bloqueio do insta! interrompendo execução")
+                        sys.exit("Bloqueio do insta! interrompendo execução")
+                    except:
+                        print("Erro desconhecido. Possivel block de usuário ??")
 
             elif "Content Unavailable" in page_title:
                 logger.warning(

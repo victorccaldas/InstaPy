@@ -210,3 +210,11 @@ xpath["likers_from_photo"] = {
 }
 
 xpath["accept_igcookie_dialogue"] = {"accept_button": "//button[text()='Accept']"}
+
+# meus
+
+xpath["page_errors"] = {
+    "inexistent": 'driver.find_element_by_xpath(\'//*[contains(text(), "The link you followed may be broken")]\')',
+    "instaBlock": 'driver.find_element_by_xpath(\'//*[contains(text(), "Please wait a few minutes before you try again")]\')',
+    "userBlock": '?',
+}
