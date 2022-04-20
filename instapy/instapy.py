@@ -135,6 +135,7 @@ class InstaPy:
         browser_executable_path: str = None,
         geckodriver_log_level: str = "info",  # "info" by default
     ):
+        global logger
         print("InstaPy Version: {}".format(__version__))
         cli_args = parse_cli_args()
         username = cli_args.username or username
@@ -325,7 +326,10 @@ class InstaPy:
         Settings.show_logs = show_logs or None
         self.multi_logs = multi_logs
         self.logfolder = get_logfolder(self.username, self.multi_logs)
-        self.logger = self.get_instapy_logger(self.show_logs, log_handler)
+        logger = self.logger = self.get_instapy_logger(self.show_logs, log_handler)
+        # self.logger = logger = self.get_instapy_logger(self.show_logs, log_handler)
+        # Tem diferença na ordem que eles são declarados? por ex. na forma do lastro que uma variável mantém sobre a outra
+
 
         get_database(make=True)  # IMPORTANT: think twice before relocating
 
@@ -980,27 +984,19 @@ class InstaPy:
                         self.logger.info("Total Follow: {}\n".format(str(followed_all)))
                         # Take a break after a good following
                         if followed_new >= relax_point:
-                            delay_random = random.randint(
-                                ceil(sleep_delay * 0.85), ceil(sleep_delay * 1.14)
-                            )
-                            sleep_time = (
-                                "{} seconds".format(delay_random)
-                                if delay_random < 60
-                                else "{} minutes".format(
-                                    truncate_float(delay_random / 60, 2)
-                                )
-                            )
-                            self.logger.info(
-                                "------=>  Followed {} new users ~sleeping "
-                                "about {}".format(followed_new, sleep_time)
-                            )
+                            delay_random = random.randint(ceil(sleep_delay * 0.85), ceil(sleep_delay * 1.14))
+
+                        
+                            self.logger.info(f"------=>  Followed {followed_new} new users)")
+                            
+                            
                             sleep(delay_random)
                             relax_point = random.randint(7, 14)
                             followed_new = 0
                             pass
 
             else:
-                self.logger.info("Noone commented, noone to follow.\n")
+                self.logger.info("None commented, none to follow.\n")
 
             sleep(1)
 
@@ -1113,17 +1109,8 @@ class InstaPy:
                             delay_random = random.randint(
                                 ceil(sleep_delay * 0.85), ceil(sleep_delay * 1.14)
                             )
-                            sleep_time = (
-                                "{} seconds".format(delay_random)
-                                if delay_random < 60
-                                else "{} minutes".format(
-                                    truncate_float(delay_random / 60, 2)
-                                )
-                            )
-                            self.logger.info(
-                                "------=>  Followed {} new users ~sleeping "
-                                "about {}".format(followed_new, sleep_time)
-                            )
+                            
+                            self.logger.info("------=>  Followed {} new users ~sleeping ".format(followed_new))
                             sleep(delay_random)
                             relax_point = random.randint(7, 14)
                             followed_new = 0
@@ -1229,16 +1216,8 @@ class InstaPy:
                 delay_random = random.randint(
                     ceil(sleep_delay * 0.85), ceil(sleep_delay * 1.14)
                 )
-                sleep_time = (
-                    "{} seconds".format(delay_random)
-                    if delay_random < 60
-                    else "{} minutes".format(truncate_float(delay_random / 60, 2))
-                )
-                self.logger.info(
-                    "Followed {} new users  ~sleeping about {}\n".format(
-                        followed_new, sleep_time
-                    )
-                )
+                
+                self.logger.info("Followed {} new users".format(followed_new))
                 sleep(delay_random)
                 followed_new = 0
                 relax_point = random.randint(7, 14)
@@ -3783,16 +3762,9 @@ class InstaPy:
                     delay_random = random.randint(
                         ceil(sleep_delay * 0.85), ceil(sleep_delay * 1.14)
                     )
-                    sleep_time = (
-                        "{} seconds".format(delay_random)
-                        if delay_random < 60
-                        else "{} minutes".format(truncate_float(delay_random / 60, 2))
-                    )
-                    self.logger.info(
-                        "------=>  Followed {} new users ~sleeping about {}\n".format(
-                            followed_new, sleep_time
-                        )
-                    )
+                    
+                    self.logger.info(f"------=>  Followed {followed_new} new users")
+                    
                     sleep(delay_random)
                     relax_point = random.randint(7, 14)
                     followed_new = 0
@@ -3966,16 +3938,8 @@ class InstaPy:
                     delay_random = random.randint(
                         ceil(sleep_delay * 0.85), ceil(sleep_delay * 1.14)
                     )
-                    sleep_time = (
-                        "{} seconds".format(delay_random)
-                        if delay_random < 60
-                        else "{} minutes".format(truncate_float(delay_random / 60, 2))
-                    )
-                    self.logger.info(
-                        "------=>  Followed {} new users ~sleeping about {}\n".format(
-                            followed_new, sleep_time
-                        )
-                    )
+                    
+                    self.logger.info(f"------=>  Followed {followed_new} new users")
                     sleep(delay_random)
                     relax_point = random.randint(7, 14)
                     followed_new = 0
