@@ -1979,9 +1979,11 @@ def is_page_available(browser, logger):
                         browser.find_element(
                         By.XPATH, read_xpath("page_errors", "instaBlock"))
                         print("Bloqueio do insta! interrompendo execução")
-                        sys.exit("Bloqueio do insta! interrompendo execução")
+                        sys.exit("Bloqueio do insta pra acessar perfis! interrompendo execução --- preciso arrumar pra não parar tudo, apenas parar follows e unfollows (atividades de acessar perfil).")
                     except:
                         print("Erro desconhecido. Possivel block de usuário ??")
+
+
 
             elif "Content Unavailable" in page_title:
                 logger.warning(
