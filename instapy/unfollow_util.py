@@ -432,8 +432,8 @@ def unfollow(
                             user_link = "https://www.instagram.com/{}/".format(person)
                             web_address_navigator(browser, user_link)
                             valid_page = is_page_available(browser, logger)
+                            
                             verificar_link('', browser.current_url)
-
 
                             if valid_page and is_follow_me(browser, person):
                                 # delay follow-backers with delay_follow_back.
@@ -974,8 +974,9 @@ def get_given_user_followers(
 
     user_link = "https://www.instagram.com/{}/".format(user_name)
     web_address_navigator(browser, user_link)
-
-    if not is_page_available(browser, logger):
+    valid_page = is_page_available(browser, logger)
+    
+    if not valid_page:
         return [], []
 
     # check how many people are following this user.
@@ -1067,8 +1068,10 @@ def get_given_user_following(
 
     user_link = "https://www.instagram.com/{}/".format(user_name)
     web_address_navigator(browser, user_link)
+    valid_page = is_page_available(browser, logger)
+    
 
-    if not is_page_available(browser, logger):
+    if not valid_page:
         return [], []
 
     #  check how many people are following this user.

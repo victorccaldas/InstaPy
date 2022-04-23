@@ -41,6 +41,7 @@ def get_following_status(
 
         # check if the page is available
         valid_page = is_page_available(browser, logger)
+        
         if not valid_page:
             logger.warning(user_inaccessible_msg)
             person_new = verify_username_by_id(
@@ -50,6 +51,7 @@ def get_following_status(
                 ig_homepage = "https://www.instagram.com/"
                 web_address_navigator(browser, ig_homepage + person_new)
                 valid_page = is_page_available(browser, logger)
+                
                 if not valid_page:
                     logger.error(failure_msg.format(person_new.encode("utf-8")))
                     return "UNAVAILABLE", None

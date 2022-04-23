@@ -1182,7 +1182,9 @@ def get_relationship_counts(browser, username, logger):
     # check URL of the webpage, if it already is user's profile page,
     # then do not navigate to it again
     web_address_navigator(browser, user_link)
-    is_page_available(browser, logger)
+    valid_page = is_page_available(browser, logger)
+    
+
 
     try:
         followers_count = browser.execute_script(
@@ -1979,7 +1981,7 @@ def is_page_available(browser, logger):
                         browser.find_element(
                         By.XPATH, read_xpath("page_errors", "instaBlock"))
                         print("Bloqueio do insta! interrompendo execução")
-                        sys.exit("Bloqueio do insta pra acessar perfis! interrompendo execução --- preciso arrumar pra não parar tudo, apenas parar follows e unfollows (atividades de acessar perfil).")
+                        raise StopIteration("Bloqueio de acesso aos perfis. Interrompendo tarefa")
                     except:
                         print("Erro desconhecido. Possivel block de usuário ??")
 

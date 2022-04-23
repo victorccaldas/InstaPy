@@ -465,13 +465,15 @@ def get_links_for_username(
     # Check URL of the webpage, if it already is user's profile page,
     # then do not navigate to it again
     web_address_navigator(browser, user_link)
-
-    if not is_page_available(browser, logger):
+    valid_page = is_page_available(browser, logger)
+    
+    if not valid_page:
         logger.error(
             "Instagram error: The link you followed may be broken, or the "
             "page may have been removed..."
         )
         return False
+
 
     # if following_status is None:
     #    browser.wait_for_valid_connection(browser, username, logger)

@@ -1,5 +1,12 @@
 from .login_util import login_user
 
+# achar o caminho relativo do insta_bot e importar.
+'''from inspect import getsourcefile
+from os.path import abspath
+exec_path = abspath(getsourcefile(lambda:0))
+from exec_path import session
+'''
+
 def verificar_link(self, url):
     '''
     Verifica se a página esperada está aberta, ou caiu no challenge ou tela de login.
@@ -7,7 +14,6 @@ def verificar_link(self, url):
     Deve ser usada após acessar algum link, com driver.get() ou comumente
     no instapy, web_address_navigator().
     '''
-    print('Verificando challenge')
     if '/challenge' in url:
         print("################ !!! Challenge detectado !!! ################")
         return
@@ -23,7 +29,8 @@ def verificar_link(self, url):
         print("################ !!! Deslog detectado !!! ################")
         
         try:
-            login_user(self.browser,
+            session.login() # Espera-se que funcione pois session é global.
+            '''login_user(self.browser,
                 self.username,
                 self.password,
                 self.logger,
@@ -33,6 +40,7 @@ def verificar_link(self, url):
                 self.security_codes,
                 self.want_check_browser,
                 )
+                '''
             print("Re-Login feito.")
         except:
             print("################ !!! Falha no login !!! ################")
