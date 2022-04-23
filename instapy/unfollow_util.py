@@ -50,7 +50,7 @@ from .util import (
     web_address_navigator,
 )
 from .xpath import read_xpath
-from .minhas_funcoes import verificar_challenge
+from .minhas_funcoes import verificar_link
 
 
 def set_automated_followed_pool(
@@ -412,8 +412,6 @@ def unfollow(
                         )
                     )
 
-                    verificar_challenge(browser.current_url)
-
                     person_id = (
                         automatedFollowedPool["all"][person]["id"]
                         if person in automatedFollowedPool["all"].keys()
@@ -434,6 +432,8 @@ def unfollow(
                             user_link = "https://www.instagram.com/{}/".format(person)
                             web_address_navigator(browser, user_link)
                             valid_page = is_page_available(browser, logger)
+                            verificar_link('', browser.current_url)
+
 
                             if valid_page and is_follow_me(browser, person):
                                 # delay follow-backers with delay_follow_back.
@@ -557,6 +557,10 @@ def follow_user(browser, track, login, user_name, button, blacklist, logger, log
         following_status, follow_button = get_following_status(
             browser, track, login, user_name, None, logger, logfolder
         )
+
+        # Verificar se está corretamente na página do perfil
+        verificar_link('', browser.current_url)
+
         if following_status in ["Follow", "Follow Back"]:
             click_visibly(browser, follow_button)  # click to follow
             follow_state, msg = verify_action(

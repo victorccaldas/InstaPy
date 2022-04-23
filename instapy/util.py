@@ -1987,7 +1987,7 @@ def is_page_available(browser, logger):
 
             elif "Content Unavailable" in page_title:
                 logger.warning(
-                    "The page isn't available!\t~the user may have blocked you..."
+                    "The page isn't available!\t~the user may have blocked you... "
                     f"{browser.current_url}"
                 )
 

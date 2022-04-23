@@ -82,7 +82,7 @@ def set_selenium_local_session(
     # Debug!!
     #firefox_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     #firefox_options.add_experimental_option('excludeSwitches', ['enable-logging'])
-    firefox_options.add_argument('--disable-blink-features=AutomationControlled')
+    firefox_options.add_argument('-disable-blink-features=AutomationControlled')
     ####
     
     if headless_browser:
@@ -90,7 +90,6 @@ def set_selenium_local_session(
 
     if browser_profile_path is None:
         firefox_profile = webdriver.FirefoxProfile()
-        print("################\nDEBUG\nfifrefox_profile criado!!!!\n################\n#################################")
     else:
         firefox_profile = webdriver.FirefoxProfile(browser_profile_path)
         firefox_options.binary = browser_executable_path

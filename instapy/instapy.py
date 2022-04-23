@@ -103,7 +103,7 @@ from .util import (
 )
 from .xpath import read_xpath
 
-from .minhas_funcoes import verificar_challenge
+from .minhas_funcoes import verificar_link
 
 
 
@@ -1525,8 +1525,6 @@ class InstaPy:
                 self.logger.info("Like# [{}/{}]".format(i + 1, len(links)))
                 self.logger.info(link)
 
-                verificar_challenge(self.browser.current_url)
-
                 try:
                     inappropriate, user_name, is_video, reason, scope = check_link(
                         self.browser,
@@ -1557,6 +1555,10 @@ class InstaPy:
                             continue
                         else:
                             web_address_navigator(self.browser, link)
+
+                        # Verificar link
+                        verificar_link(self, self.browser.current_url)
+
 
                         # try to like
                         like_state, msg = like_image(

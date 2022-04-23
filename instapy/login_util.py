@@ -245,6 +245,8 @@ def login_user(
     security_code_to_phone,
     security_codes,
     want_check_browser,
+    # relog = False # por mim. A ideia é retornar sem executar processos desnecessários no relog
+    # Isso é aparentemente desnecessário
 ):
     """Logins the user with the given username and password"""
     assert username, "Username not provided"
