@@ -1,4 +1,3 @@
-from .instapy import InstaPy
 from .login_util import login_user
 from .util import get_current_url
 
@@ -48,7 +47,7 @@ def verificar_link(browser):
                 security_codes,
                 want_check_browser,
             )'''
-            Instapy.login()
+            #Instapy.login()
 
             print("Re-Login feito.")
         except:
