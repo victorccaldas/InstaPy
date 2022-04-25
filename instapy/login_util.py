@@ -174,17 +174,17 @@ def check_browser(browser, logfolder, logger, proxy_address):
         # check connection status
         try:
             logger.info("-- Connection Checklist [1/2] (Internet Connection Status)")
-            browser.get("view-source:https://api.ipify.org/?format=json")
+            browser.get("view-source:http://ip-api.com/json/")
             pre = browser.find_element(By.CLASS_NAME, "line-content").text
             current_ip_info = json.loads(pre)
             if (
                 proxy_address is not None
-                and socket.gethostbyname(proxy_address) != current_ip_info["ip"]
+                and socket.gethostbyname(proxy_address) != current_ip_info["query"]
             ):
                 logger.warning("- Proxy is set, but it's not working properly")
                 logger.warning(
                     '- Expected Proxy IP is "{}", and the current IP is "{}"'.format(
-                        proxy_address, current_ip_info["ip"]
+                        proxy_address, current_ip_info["query"]
                     )
                 )
                 logger.warning("- Try again or disable the Proxy Address on your setup")
@@ -194,9 +194,9 @@ def check_browser(browser, logfolder, logger, proxy_address):
                 logger.info("- Internet Connection Status: ok")
                 logger.info(
                     '- Current IP is "{}" and it\'s from "{}/{}"'.format(
-                        current_ip_info["ip"],
-                        current_ip_info["country_name"],
-                        current_ip_info["country_code"],
+                        current_ip_info["query"],
+                        current_ip_info["country"],
+                        current_ip_info["countryCode"],
                     )
                 )
                 update_activity(
@@ -219,6 +219,7 @@ def check_browser(browser, logfolder, logger, proxy_address):
             if _testConnection == 2:
                 logger.error("- Could not connect to Instagram. Aborting...")
                 return False
+            print(Exception)
             print("Tentando reconectar...")
             sleep(30)
             
