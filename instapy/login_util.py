@@ -207,7 +207,7 @@ def check_browser(browser, logfolder, logger, proxy_address):
                     logger=logger,
                 )
                 break
-        except Exception:
+        except Exception as err:
             logger.warning("- Internet Connection Status: error")
             update_activity(
                 browser,
@@ -219,7 +219,7 @@ def check_browser(browser, logfolder, logger, proxy_address):
             if _testConnection == 2:
                 logger.error("- Could not connect to Instagram. Aborting...")
                 return False
-            print(Exception)
+            print(err)
             print("Tentando reconectar...")
             sleep(30)
             
