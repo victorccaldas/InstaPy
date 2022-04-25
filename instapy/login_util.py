@@ -175,7 +175,7 @@ def check_browser(browser, logfolder, logger, proxy_address):
         try:
             logger.info("-- Connection Checklist [1/2] (Internet Connection Status)")
             browser.get("view-source:http://ip-api.com/json/")
-            pre = browser.find_element(By.CLASS_NAME, "line-content").text
+            pre = browser.find_element(By.TAG_NAME, "pre").text
             current_ip_info = json.loads(pre)
             if (
                 proxy_address is not None
