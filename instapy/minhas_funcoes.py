@@ -1,4 +1,4 @@
-from .login_util import login_user
+#from .login_util import login_user
 from .util import get_current_url
 
 # achar o caminho relativo do insta_bot e importar.
