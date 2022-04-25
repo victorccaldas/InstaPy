@@ -1982,8 +1982,9 @@ def is_page_available(browser, logger):
                         By.XPATH, read_xpath("page_errors", "instaBlock"))
                         print("Bloqueio do insta! interrompendo execução")
                         raise StopIteration("Bloqueio de acesso aos perfis. Interrompendo tarefa")
-                    except:
-                        print("Erro desconhecido. Possivel block de usuário ??")
+                    except Exception as e:
+                        print("Erro não reconhecido. Possivel block de usuário ??")
+                        print("\n ======= Erro: ======= \n\n", e, '\n\n===========================')
 
 
 
