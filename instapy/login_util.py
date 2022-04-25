@@ -174,8 +174,8 @@ def check_browser(browser, logfolder, logger, proxy_address):
         # check connection status
         try:
             logger.info("-- Connection Checklist [1/2] (Internet Connection Status)")
-            browser.get("view-source:https://freegeoip.app/json")
-            pre = browser.find_element(By.TAG_NAME, "pre").text
+            browser.get("view-source:https://api.ipify.org/?format=json")
+            pre = browser.find_element(By.CLASS_NAME, "line-content").text
             current_ip_info = json.loads(pre)
             if (
                 proxy_address is not None
