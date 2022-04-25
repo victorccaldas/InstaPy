@@ -1,5 +1,5 @@
 #from .login_util import login_user
-from .util import get_current_url
+from . import util
 
 # achar o caminho relativo do insta_bot e importar.
 '''from inspect import getsourcefile
@@ -18,7 +18,7 @@ def verificar_link(browser):
     Deve ser usada após acessar algum link, com driver.get() ou comumente
     no instapy, web_address_navigator().
     '''
-    url = get_current_url(browser)
+    url = util.get_current_url(browser)
 
     if '/challenge' in url:
         print("################ !!! Challenge detectado !!! ################")
