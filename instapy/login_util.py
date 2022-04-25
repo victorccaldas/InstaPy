@@ -235,6 +235,41 @@ def check_browser(browser, logfolder, logger, proxy_address):
     # everything is ok, then continue(True)
     return True
 
+def load_cookie(browser, logger, cookie_file, username):
+        cookie_loaded = None
+        login_state = None
+        # try to load cookie from username
+        try:
+            for cookie in pickle.load(open(cookie_file, "rb")):
+                # SameSite = Strict, your cookie will only be sent in a
+                # first-party context. In user terms, the cookie will only be sent
+                # if the site for the cookie matches the site currently shown in
+                # the browser's URL bar.
+                if "sameSite" in cookie and cookie["sameSite"] == "None":
+                    cookie["sameSite"] = "Strict"
+
+                browser.add_cookie(cookie)
+
+            sleep(4)
+            cookie_loaded = True
+            logger.info("- Cookie file for user '{}' loaded...".format(username))
+
+            # force refresh after cookie load or check_authorization() will FAIL
+            reload_webpage(browser)
+            sleep(4)
+
+            # cookie has been LOADED, so the user SHOULD be logged in
+            login_state = check_authorization(
+                browser, username, "activity counts", logger, False
+            )
+            sleep(4)
+
+        except (WebDriverException, OSError, IOError):
+            # Just info the user, not an error
+            logger.info("- Cookie file not found, creating cookie...")
+
+        return cookie_loaded, login_state
+
 
 def login_user(
     browser,
@@ -263,38 +298,8 @@ def login_user(
     web_address_navigator(browser, ig_homepage)
 
     cookie_file = "{0}{1}_cookie.pkl".format(logfolder, username)
-    cookie_loaded = None
-    login_state = None
 
-    # try to load cookie from username
-    try:
-        for cookie in pickle.load(open(cookie_file, "rb")):
-            # SameSite = Strict, your cookie will only be sent in a
-            # first-party context. In user terms, the cookie will only be sent
-            # if the site for the cookie matches the site currently shown in
-            # the browser's URL bar.
-            if "sameSite" in cookie and cookie["sameSite"] == "None":
-                cookie["sameSite"] = "Strict"
-
-            browser.add_cookie(cookie)
-
-        sleep(4)
-        cookie_loaded = True
-        logger.info("- Cookie file for user '{}' loaded...".format(username))
-
-        # force refresh after cookie load or check_authorization() will FAIL
-        reload_webpage(browser)
-        sleep(4)
-
-        # cookie has been LOADED, so the user SHOULD be logged in
-        login_state = check_authorization(
-            browser, username, "activity counts", logger, False
-        )
-        sleep(4)
-
-    except (WebDriverException, OSError, IOError):
-        # Just info the user, not an error
-        logger.info("- Cookie file not found, creating cookie...")
+    cookie_loaded, login_state = load_cookie(browser, logger, cookie_file, username)
 
     if login_state and cookie_loaded:
         # Cookie loaded and joined IG, dismiss following features if availables

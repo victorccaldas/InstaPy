@@ -1,4 +1,6 @@
+from .instapy import InstaPy
 from .login_util import login_user
+from .util import get_current_url
 
 # achar o caminho relativo do insta_bot e importar.
 '''from inspect import getsourcefile
@@ -7,13 +9,18 @@ exec_path = abspath(getsourcefile(lambda:0))
 from exec_path import session
 '''
 
-def verificar_link(self, url):
+class DeslogError(Exception):
+    pass
+
+def verificar_link(browser):
     '''
     Verifica se a página esperada está aberta, ou caiu no challenge ou tela de login.
 
     Deve ser usada após acessar algum link, com driver.get() ou comumente
     no instapy, web_address_navigator().
     '''
+    url = get_current_url(browser)
+
     if '/challenge' in url:
         print("################ !!! Challenge detectado !!! ################")
         return
@@ -28,19 +35,21 @@ def verificar_link(self, url):
     if '/login' in url:
         print("################ !!! Deslog detectado !!! ################")
         
+        raise DeslogError("Deslog detectado")
+
         try:
-            session.login() # Espera-se que funcione pois session é global.
-            '''login_user(self.browser,
-                self.username,
-                self.password,
-                self.logger,
-                self.logfolder,
-                self.proxy_address,
-                self.bypass_security_challenge_using,
-                self.security_codes,
-                self.want_check_browser,
-                )
-                '''
+            '''login_user(browser,
+                username,
+                password,
+                logger,
+                logfolder,
+                proxy_address,
+                security_code_to_phone,
+                security_codes,
+                want_check_browser,
+            )'''
+            Instapy.login()
+
             print("Re-Login feito.")
         except:
             print("################ !!! Falha no login !!! ################")
@@ -50,3 +59,11 @@ def verificar_link(self, url):
         # pra sair da função e continuar demais atividades assim que relogar quando relog=True)
     
         
+# problema: Essa função será executado pelo web_driver_navigator,
+# que por sua vez é executada tb quando vai fazer o login.
+# portanto deve ficar um loop infinito.
+
+# Solução:
+# Chamar fora do navigator (como era antes),
+# sempre que verificar tela de login ou challenge levantar Exception específica,
+# tentar executar funções e se a Exception especifica por levantada, session.login novamente 

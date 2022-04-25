@@ -1557,8 +1557,7 @@ class InstaPy:
                             web_address_navigator(self.browser, link)
 
                         # Verificar link
-                        verificar_link(self, self.browser.current_url)
-
+                        verificar_link(self.browser) 
 
                         # try to like
                         like_state, msg = like_image(

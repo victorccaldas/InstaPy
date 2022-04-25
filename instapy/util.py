@@ -46,6 +46,9 @@ from .time_util import sleep, sleep_actual
 # import InstaPy modules
 from .xpath import read_xpath
 
+from .minhas_funcoes import verificar_link, DeslogError
+
+
 default_profile_pic_instagram = [
     "https://instagram.flas1-2.fna.fbcdn.net/vp"
     "/a8539c22ed9fec8e1c43b538b1ebfd1d/5C5A1A7A/t51.2885-19"
@@ -1995,6 +1998,10 @@ def is_page_available(browser, logger):
                 )
 
             return False
+    if '/login' in browser.current_url:
+        print("DESLOG OCORREU!!")
+        raise DeslogError
+        return False
 
     return True
 

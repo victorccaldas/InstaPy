@@ -433,7 +433,7 @@ def unfollow(
                             web_address_navigator(browser, user_link)
                             valid_page = is_page_available(browser, logger)
                             
-                            verificar_link('', browser.current_url)
+                            verificar_link(browser) # pois inclui dentro da web_address_navigator
 
                             if valid_page and is_follow_me(browser, person):
                                 # delay follow-backers with delay_follow_back.
@@ -559,7 +559,7 @@ def follow_user(browser, track, login, user_name, button, blacklist, logger, log
         )
 
         # Verificar se está corretamente na página do perfil
-        verificar_link('', browser.current_url)
+        verificar_link(browser) # pois inclui dentro da web_address_navigator
 
         if following_status in ["Follow", "Follow Back"]:
             click_visibly(browser, follow_button)  # click to follow
