@@ -105,7 +105,8 @@ from .xpath import read_xpath
 
 from .minhas_funcoes import verificar_link
 
-
+class DeslogError(Exception):
+    pass
 
 class InstaPy:
     """Class to be instantiated to use the script"""
