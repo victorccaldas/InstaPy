@@ -1,5 +1,6 @@
 #from .login_util import login_user
 from . import util
+from . import instapy
 
 # achar o caminho relativo do insta_bot e importar.
 '''from inspect import getsourcefile
@@ -8,8 +9,8 @@ exec_path = abspath(getsourcefile(lambda:0))
 from exec_path import session
 '''
 
-class DeslogError(Exception):
-    pass
+#class DeslogError(Exception):
+#    pass
 
 def verificar_link(browser):
     '''
@@ -34,7 +35,7 @@ def verificar_link(browser):
     if '/login' in url:
         print("################ !!! Deslog detectado !!! ################")
         
-        raise DeslogError("Deslog detectado")
+        raise instapy.DeslogError("Deslog detectado")
 
         try:
             '''login_user(browser,
