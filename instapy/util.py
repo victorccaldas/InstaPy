@@ -47,7 +47,7 @@ from .time_util import sleep, sleep_actual
 from .xpath import read_xpath
 
 from .minhas_funcoes import verificar_link
-from .instapy import DeslogError
+from . import instapy
 
 
 default_profile_pic_instagram = [
@@ -2003,7 +2003,7 @@ def is_page_available(browser, logger):
             return False
     if '/login' in browser.current_url:
         print("DESLOG OCORREU!!")
-        raise DeslogError(errorstart, "A conta foi deslogada pelo Instagram!!", errorend)
+        raise instapy.DeslogError(errorstart, "A conta foi deslogada pelo Instagram!!", errorend)
         #return False
 
     return True
