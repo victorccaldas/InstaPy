@@ -46,7 +46,8 @@ from .time_util import sleep, sleep_actual
 # import InstaPy modules
 from .xpath import read_xpath
 
-from .minhas_funcoes import verificar_link, DeslogError
+from .minhas_funcoes import verificar_link
+from .instapy import DeslogError
 
 
 default_profile_pic_instagram = [
