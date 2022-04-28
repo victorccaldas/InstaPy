@@ -499,7 +499,7 @@ def getUserData(
             break
 
     if not shared_data:
-        raise Exception("Dados do usuário-self inacessíveis. (Provável bloqueio do Insta)")
+        raise StopIteration("Dados do self-usuário inacessíveis. (Provável bloqueio do Insta)")
 
     # fetches all data needed
     get_key = shared_data.get("entry_data").get("ProfilePage")
