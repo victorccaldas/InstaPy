@@ -484,6 +484,8 @@ def unfollow(
                             logger,
                             logfolder,
                         )
+                    except StopIteration:
+                        raise StopIteration("Parando tarefa de unfollow")
                     except BaseException as e:
                         logger.error("Unfollow loop error:  {}\n".format(str(e)))
 
@@ -528,6 +530,8 @@ def unfollow(
                     )
                     index += 1
                     continue
+        except StopIteration:
+            raise StopIteration("Parando tarefa de unfollow")
         except BaseException as e:
             logger.error("Unfollow loop error:  {}\n".format(str(e)))
     else:
