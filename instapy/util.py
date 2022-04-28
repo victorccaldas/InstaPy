@@ -493,7 +493,13 @@ def getUserData(
     browser,
     basequery="no-longer-needed",
 ):
-    shared_data = get_shared_data(browser)
+    for _ in range(3):
+        shared_data = get_shared_data(browser)
+        if shared_data:
+            break
+
+    if not shared_data:
+        raise Exception("Dados do usuário-self inacessíveis. (Provável bloqueio do Insta)")
 
     # fetches all data needed
     get_key = shared_data.get("entry_data").get("ProfilePage")
@@ -1986,7 +1992,7 @@ def is_page_available(browser, logger):
                     # add if & add 's' no elements
                 elif browser.find_elements(By.XPATH, read_xpath("page_errors", "instaBlock")):
                     print("Bloqueio do insta - soft! interrompendo execução")
-                    raise StopIteration(errorstart,"Bloqueio de acesso aos perfis. Interrompendo tarefa",errorend)
+                    raise StopIteration(errorstart + "Bloqueio de acesso aos perfis. Interrompendo tarefa" + errorend)
                     #except Exception as e:
                 else:
                     print("Erro não reconhecido. Possivel block de usuário ??")
