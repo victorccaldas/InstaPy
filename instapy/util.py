@@ -1970,8 +1970,6 @@ def is_page_available(browser, logger):
     """Check if the page is available and valid"""
     expected_keywords = ["Page Not Found", "Content Unavailable"]
     page_title = get_page_title(browser, logger)
-    errorstart = "\n ======= Erro: ======= \n\n"
-    errorend = '\n\n===========================\n'
 
     if any(keyword in page_title for keyword in expected_keywords):
         reload_webpage(browser)
@@ -1991,8 +1989,8 @@ def is_page_available(browser, logger):
                         # Ta caindo dentro do try, raising exception e dps caindo no except. E não parando a execução.
                     # add if & add 's' no elements
                 elif browser.find_elements(By.XPATH, read_xpath("page_errors", "instaBlock")):
-                    print("Bloqueio do insta - soft! interrompendo execução")
-                    raise StopIteration(errorstart + "Bloqueio de acesso aos perfis. Interrompendo tarefa" + errorend)
+                    print("\n\nBloqueio do insta - soft! interrompendo execução =======================")
+                    raise StopIteration("Bloqueio de acesso aos perfis. Interrompendo tarefa")
                     #except Exception as e:
                 else:
                     print("Erro não reconhecido. Possivel block de usuário ??")
@@ -2008,8 +2006,8 @@ def is_page_available(browser, logger):
 
             return False
     if '/login' in browser.current_url:
-        print("DESLOG OCORREU!!")
-        raise instapy.DeslogError(errorstart, "A conta foi deslogada pelo Instagram!!", errorend)
+        print("\n\nDESLOG OCORREU!! =======================")
+        raise instapy.DeslogError("A conta foi deslogada pelo Instagram!!")
         #return False
 
     return True
