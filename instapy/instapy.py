@@ -3067,7 +3067,7 @@ class InstaPy:
             self.logger.info(tags)
             self.like_by_tags(tags, amount, media)
         except TypeError as err:
-            return get_error(self, err)
+            return InstaPy.get_error(self, err)
             
 
         return self
