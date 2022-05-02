@@ -4043,7 +4043,7 @@ class InstaPy:
                 return self
 
             else:
-                InstaPy.get_error(self, err)
+                InstaPy.get_error(self, exc)
 
         return self
 
