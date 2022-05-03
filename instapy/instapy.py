@@ -992,7 +992,7 @@ class InstaPy:
                             
                             
                             sleep(delay_random)
-                            relax_point = random.randint(7, 14)
+                            relax_point = random.randint(7, 24)
                             followed_new = 0
                             pass
 
@@ -1063,7 +1063,7 @@ class InstaPy:
         commented_init = self.commented
         inap_img_init = self.inap_img
 
-        relax_point = random.randint(7, 14)  # you can use some plain value
+        relax_point = random.randint(6, 25)  # you can use some plain value
         # `10` instead of this quitely randomized score
         self.quotient_breach = False
 
@@ -1113,7 +1113,7 @@ class InstaPy:
                             
                             self.logger.info("------=>  Followed {} new users ~sleeping ".format(followed_new))
                             sleep(delay_random)
-                            relax_point = random.randint(7, 14)
+                            relax_point = random.randint(7, 18)
                             followed_new = 0
                             pass
 
@@ -1181,7 +1181,7 @@ class InstaPy:
         commented_init = self.commented
         inap_img_init = self.inap_img
 
-        relax_point = random.randint(7, 14)  # you can use some plain value
+        relax_point = random.randint(7, 24)  # you can use some plain value
         # `10` instead of this quitely randomized score
         self.quotient_breach = False
 
@@ -1221,7 +1221,7 @@ class InstaPy:
                 self.logger.info("Followed {} new users".format(followed_new))
                 sleep(delay_random)
                 followed_new = 0
-                relax_point = random.randint(7, 14)
+                relax_point = random.randint(5, 14)
                 pass
 
             if not follow_restriction(
@@ -3643,7 +3643,7 @@ class InstaPy:
         not_valid_users = 0
 
         # below, you can use some static value `10` instead of random ones..
-        relax_point = random.randint(7, 14)
+        relax_point = random.randint(7, 34)
 
         # hold the current global values for differentiating at the end
         already_followed_init = self.already_followed
@@ -3829,7 +3829,7 @@ class InstaPy:
         inap_img_init = self.inap_img
 
         # below, can use a static value instead of from random range..
-        relax_point = random.randint(7, 14)
+        relax_point = random.randint(7, 22)
         self.quotient_breach = False
 
         for index, user in enumerate(usernames):
@@ -3943,7 +3943,7 @@ class InstaPy:
                     
                     self.logger.info(f"------=>  Followed {followed_new} new users")
                     sleep(delay_random)
-                    relax_point = random.randint(7, 14)
+                    relax_point = random.randint(7, 21)
                     followed_new = 0
 
         # final words
