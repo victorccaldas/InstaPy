@@ -1989,7 +1989,7 @@ def is_page_available(browser, logger):
                         # Ta caindo dentro do try, raising exception e dps caindo no except. E não parando a execução.
                     # add if & add 's' no elements
                 elif browser.find_elements(By.XPATH, read_xpath("page_errors", "instaBlock")):
-                    print("\n\nBloqueio do insta - soft! interrompendo execução =======================")
+                    print("\n\n[BLOCK] Bloqueio do insta - soft! interrompendo execução ~~~~~~~~~~~~~~~~~~~~~~~~")
                     raise StopIteration("Bloqueio de acesso aos perfis. Interrompendo tarefa")
                     #except Exception as e:
                 else:
@@ -2006,7 +2006,7 @@ def is_page_available(browser, logger):
 
             return False
     if '/login' in browser.current_url:
-        print("\n\nDESLOG OCORREU!! =======================")
+        print("\n\n~[BLOCK] DESLOG OCORREU!! =======================")
         raise instapy.DeslogError("A conta foi deslogada pelo Instagram!!")
         #return False
 

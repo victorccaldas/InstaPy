@@ -646,7 +646,7 @@ def check_link(
                         owner_comments = owner_comments + "\n" + comment["text"]
             
     except:
-        logger.warning("Stopped... IG 'post_page' changed. This is the dump: {}".format(post_page))
+        logger.warning("Stopped... IG 'post_page' changed. This is the dump: {}".format(" DUMP REMOVIDO POR MIM - Motivo: no-spam")) # post_page))
         return True, None, None, "Unavailable Data", "Failure"
 
     if owner_comments == "":
@@ -669,7 +669,7 @@ def check_link(
 
     logger.info("Image from: {}".format(user_name.encode("utf-8")))
     logger.info("Image link: {}".format(post_link.encode("utf-8")))
-    logger.info("Description: {}".format(image_text.encode("utf-8")))
+    # logger.info("Description: {}".format(image_text.encode("utf-8"))) # desativei pra no-spam
 
     # Check if mandatory character set, before adding the location to the text
     if mandatory_language:
