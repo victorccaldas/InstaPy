@@ -739,8 +739,10 @@ def get_users_through_dialog_with_graphql(
         followers_list.append(follower["node"]["username"])
 
     has_next_page = data["data"]["user"][str(edge_type)]["page_info"]["has_next_page"]
-
+    page_counter = 0
     while has_next_page and len(followers_list) <= amount:
+        page_counter += 1
+
         # server call interval
         sleep(random.randint(2, 6))
 
@@ -827,6 +829,8 @@ def get_users_through_dialog_with_graphql(
         #                 simulated_list.extend(quick_follow)
 
         #     simulator_counter = 0
+
+    print("[DEBUG] Páginas de seguidores buscadas: ", page_counter, '--------------------------------------------------')
 
     # shuffle it if randomize is enable
     if randomize:
