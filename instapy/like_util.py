@@ -41,6 +41,8 @@ from .util import (
     web_address_navigator,
 )
 from .xpath import read_xpath
+from .minhas_funcoes import verificar_link
+
 
 
 def get_links_from_feed(browser, amount, num_of_search, logger):
@@ -797,6 +799,10 @@ def like_image(browser, username, blacklist, logger, logfolder, total_liked_img)
             naply = get_action_delay("like")
             sleep(naply)
 
+            # Antes de verificar liked_image, tenho que certificar url da página
+            verificar_link(browser)
+
+
             # after liking an image we do check if liking activity was blocked
             if not verify_liked_image(browser, logger):
                 return False, "block on likes"
@@ -832,9 +838,9 @@ def verify_liked_image(browser, logger):
         return True
     else:
         logger.warning("--> Image was NOT liked! You have a BLOCK on likes!")
-        print("Debug: tirando screenshot...")
-        pth = browser.save_screenshot("screenshot_debug_likeblock.png")
-        print('path? : ', pth)
+        print("Debug: tirando screenshot do like-block... -> screenshot_debug_likeblock.png")
+        browser.save_screenshot("screenshot_debug_likeblock.png")
+        # Primeiro debug: Foi devido a Deslog!!
         return False
 
 
