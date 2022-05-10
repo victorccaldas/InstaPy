@@ -465,6 +465,9 @@ class InstaPy:
 
             self.aborting = True
             return self
+        
+        # adicionado por mim pra corrigir Deslog error
+        self.aborting = False 
 
         # back the page_delay to default, or the value set by the user
         self.browser.implicitly_wait(self.page_delay)
@@ -1905,10 +1908,8 @@ class InstaPy:
         media: str = None,
     ):
         """Likes (default) 50 images per given tag"""
-        print("Entrou na função!!!")
         if self.aborting:
             return self
-        print("Continuou a função!!!")
 
         liked_img = 0
         already_liked = 0
