@@ -830,7 +830,7 @@ def get_users_through_dialog_with_graphql(
 
         #     simulator_counter = 0
 
-    print("[DEBUG] Páginas de seguidores buscadas: ", page_counter, '--------------------------------------------------')
+    print("[DEBUG] Qtd. de páginas de dados de seguidores buscadas: ", page_counter, '--------------------------------------------------')
 
     # shuffle it if randomize is enable
     if randomize:

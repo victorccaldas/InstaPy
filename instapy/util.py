@@ -2006,7 +2006,7 @@ def is_page_available(browser, logger):
 
             return False
     if '/login' in browser.current_url:
-        print("\n\n~[BLOCK] DESLOG OCORREU!! =======================")
+        print("\n\n~[BLOCK] DESLOG OCORREU!! =======================\n\n")
         raise instapy.DeslogError("A conta foi deslogada pelo Instagram!!")
         #return False
 
