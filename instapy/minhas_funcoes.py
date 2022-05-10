@@ -1,6 +1,9 @@
 #from .login_util import login_user
+from selenium.webdriver.common.by import By
+
 from . import util
 from . import instapy
+from . import xpath_compile
 
 # achar o caminho relativo do insta_bot e importar.
 '''from inspect import getsourcefile
@@ -11,6 +14,17 @@ from exec_path import session
 
 #class DeslogError(Exception):
 #    pass
+
+def sendPhoneConfirmationAndWaitResponse(browser):
+    '''
+    Envia SMS de confirmação e aguarda resposta no Telegram.
+    '''
+    # clicar no botão "Send confirmation"
+    browser.find_element(By.XPATH, xpath['page_errors']['confirmNumberButton']).click()
+
+    assert "confirmation sent" in browser.title.lower()
+    # aguardar resposta do Telegram
+
 
 def verificar_link(browser):
     '''

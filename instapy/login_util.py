@@ -457,7 +457,12 @@ def login_user(
     accept_igcookie_dialogue(browser, logger)
 
     # check for login error messages and display it in the logs
+    if 'add phone number' in browser.title.lower():
+        print('\n\n\n========== Debug: phone number block detected ==========\n\n\n')
+        sendPhoneConfirmationAndWaitResponse() # a escrever.
+
     if "instagram.com/challenge" in browser.current_url:
+        print("\n\n\n================== Debug: CHALLENGE BLOCK DETECTED =================\n\n\n")
         # check if account is disabled by Instagram,
         # or there is an active challenge to solve
         try:

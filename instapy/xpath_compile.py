@@ -217,4 +217,5 @@ xpath["page_errors"] = {
     "inexistent": "//*[contains(text(), 'The link you followed may be broken')]",
     "instaBlock": "//*[contains(text(), 'Please wait a few minutes before you try again')]",
     "userBlock": '?',
+    "confirmNumberButton": "//button[contains(text(), 'Send confirmation')]",
 }
