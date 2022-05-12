@@ -4038,7 +4038,7 @@ class InstaPy:
                 self.logfolder,
             )
             self.logger.info("--> Total people unfollowed : {}\n".format(unfollowed))
-            self.logger.info("Obs. Tentou seguir todas, mas conseguiu {}\n".format(unfollowed))
+            self.logger.info("Obs. Tentou desseguir todas, mas conseguiu {}\n".format(unfollowed))
             self.unfollowed += unfollowed
 
         except Exception as exc:
