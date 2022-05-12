@@ -37,6 +37,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
 
+from exceptions import DeslogError
+
 from .database_engine import get_database
 from .event import Event
 from .quota_supervisor import quota_supervisor
@@ -499,7 +501,7 @@ def getUserData(
             break
 
     if not shared_data:
-        raise StopIteration("Dados do self-usuário inacessíveis. (Provável bloqueio do Insta)")
+        raise StopIteration("[BLOCK] Dados do self-usuário inacessíveis. (Provável bloqueio do Insta)")
 
     # fetches all data needed
     get_key = shared_data.get("entry_data").get("ProfilePage")
@@ -514,8 +516,11 @@ def getUserData(
     else:
         subobjects = query.split(".")
         for subobject in subobjects:
-            data = data[subobject]
-
+            try:
+                data = data[subobject]
+            except TypeError as e:
+                raise DeslogError("[BLOCK] Deslog ocorreu no login. Tentando novamente..."
+                                    "\nErro: \n"+str(e))
     return data
 
 
