@@ -1,0 +1,1 @@
+configs_path = 'C:/Users/Victor/Documents/Python/InstaActionBot/configs.json'
