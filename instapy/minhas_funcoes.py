@@ -9,8 +9,6 @@ from . import util
 from . import instapy
 from . import xpath_compile
 
-from configs_path import configs_path
-
 # achar o caminho relativo do insta_bot e importar.
 '''from inspect import getsourcefile
 from os.path import abspath
@@ -18,6 +16,7 @@ exec_path = abspath(getsourcefile(lambda:0))
 from exec_path import session
 '''
 
+configs_path = 'C:/Users/Victor/Documents/Python/InstaActionBot/configs.json'
 
 class Telegram:
     with open(configs_path, 'r') as f: userConfigs = json.load(f)
