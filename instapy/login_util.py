@@ -501,6 +501,28 @@ def login_user(
         except NoSuchElementException:
             pass
 
+        # in case instagram asks the user to update phone for Instagram account
+        try:
+            browser.find_element(
+                By.XPATH, read_xpath(login_user.__name__, "update_phone_number")
+            )
+            challenge_warn_msg = (
+                "Instagram initiated a challenge before allow your account to login. "
+                "At the moment there isn't a phone number linked to your Instagram "
+                "account. Please, add a phone number to your account, and try again."
+            )
+            logger.warning(challenge_warn_msg)
+            update_activity(
+                browser,
+                action=None,
+                state=challenge_warn_msg,
+                logfolder=logfolder,
+                logger=logger,
+            )
+            return False
+        except NoSuchElementException:
+            pass
+
         # try to initiate security code challenge
         try:
             browser.find_element(
