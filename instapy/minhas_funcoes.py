@@ -59,10 +59,11 @@ def waitPhoneConfirmationResponse(browser):
         responses = Telegram.read_group()
         
         # mensagens recebidas depois de enviar mensagem pedindo o codigo
+        # mais antigo primeiro
         msgs = [msg for msg, epoch in responses if epoch > epoch_start]
         
         # mais recente primeiro
-        msgs.reverse()
+        #msgs.reverse()
             
         if not len(msgs):
             print("\n [Telegram]: Aguardando resposta...\n")

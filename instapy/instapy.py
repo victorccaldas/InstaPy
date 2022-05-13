@@ -1204,7 +1204,7 @@ class InstaPy:
             if follow_restriction(
                 "read", acc_to_follow, self.follow_times, self.logger
             ):
-                print("")
+                print("[Follow restriction]\n")
                 continue
 
             if not users_validated:
@@ -1295,7 +1295,7 @@ class InstaPy:
             self.logger.info("Not valid users: {}".format(not_valid_users))
 
             if interact is True:
-                print("")
+                print("[Interact is True]\n")
                 # find the feature-wide action sizes by taking a difference
                 liked = self.liked_img - liked_init
                 already_liked = self.already_liked - already_liked_init

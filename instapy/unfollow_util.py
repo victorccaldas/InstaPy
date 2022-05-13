@@ -571,6 +571,7 @@ def follow_user(browser, track, login, user_name, button, blacklist, logger, log
                 browser, "follow", track, login, user_name, None, logger, logfolder
             )
             if follow_state is not True:
+                print("[BLOCK] Não seguiu!!")
                 return False, msg
 
         elif following_status in ["Following", "Requested"]:
@@ -614,6 +615,7 @@ def follow_user(browser, track, login, user_name, button, blacklist, logger, log
         sleep(3)
 
     # general tasks after a successful follow
+    print("[Debug] Entrando aqui mesmo quando não segue!")
     logger.info("--> Followed '{}'!".format(user_name.encode("utf-8")))
     Event().followed(user_name)
     update_activity(
