@@ -502,7 +502,7 @@ def login_user(
             pass
 
         # in case instagram asks the user to update phone for Instagram account
-        try:
+        '''try:
             browser.find_element(
                 By.XPATH, read_xpath(login_user.__name__, "update_phone_number")
             )
@@ -521,7 +521,7 @@ def login_user(
             )
             return False
         except NoSuchElementException:
-            pass
+            pass'''
 
         # try to initiate security code challenge
         try:
