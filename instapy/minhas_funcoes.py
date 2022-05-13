@@ -2,6 +2,7 @@
 from selenium.webdriver.common.by import By
 from datetime import datetime
 import requests
+import platform
 import json
 import time
 
@@ -16,7 +17,9 @@ exec_path = abspath(getsourcefile(lambda:0))
 from exec_path import session
 '''
 
-configs_path = 'C:/Users/Victor/Documents/Python/InstaActionBot/configs.json'
+if platform.system() == 'Windows': configs_path = 'C:/Users/Victor/Documents/Python/InstaActionBot/configs.json'
+elif platform.system() == 'Linux': configs_path = '/home/victor/Desktop/InstaActionBot/configs.json'
+else: "Não foi possível identificar o sistema operacional."; exit()
 
 class Telegram:
     with open(configs_path, 'r') as f: userConfigs = json.load(f)
