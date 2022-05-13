@@ -1,5 +1,9 @@
 #from .login_util import login_user
 from selenium.webdriver.common.by import By
+from datetime import datetime
+import requests
+import json
+import time
 
 from . import util
 from . import instapy
@@ -12,19 +16,61 @@ exec_path = abspath(getsourcefile(lambda:0))
 from exec_path import session
 '''
 
-#class DeslogError(Exception):
-#    pass
+with open('user_configs/configs_path.txt','r') as f: configs_path = f.read()
 
-def sendPhoneConfirmationAndWaitResponse(browser):
+class Telegram:
+    with open(configs_path, 'r') as f: userConfigs = json.load(f)
+
+    apikey = userConfigs['telegramBotApiKey']
+    groupid = userConfigs['telegramGroupId']
+        
+    def send(msg):
+        send_msg = "https://api.telegram.org/bot"+Telegram.apikey+"/sendMessage?chat_id="+Telegram.groupid+"&text="+msg
+        r = requests.get(send_msg)
+        print("\n [Telegram]: ", msg, '\n')
+        return r
+
+    def read_group():
+        def get_text(msg):
+            try:
+                return (msg['message']['text'], msg['message']['date'])
+            except:
+                pass
+
+        get_updates = 'https://api.telegram.org/bot{}/getUpdates'.format(Telegram.apikey)
+        r = requests.get(get_updates)
+        r = r.json()
+        group_messages = [i for i in r['result'] if str(i['message']['chat']['id']) == Telegram.groupid]
+        last_messages = [get_text(i) for i in group_messages]
+        last_messages.remove(None)
+        return last_messages
+
+def waitPhoneConfirmationResponse(browser):
     '''
-    Envia SMS de confirmação e aguarda resposta no Telegram.
+    Fica lendo o Telegram, aguardando resposta com o código.
     '''
-    # clicar no botão "Send confirmation"
-    browser.find_element(By.XPATH, xpath['page_errors']['confirmNumberButton']).click()
+    Telegram.send("Qual é o código de verificação no seu SMS? O próximo texto do chat será utilizado (mensagem automática)")
+    epoch_start = datetime.now().timestamp()
 
-    assert "confirmation sent" in browser.title.lower()
-    # aguardar resposta do Telegram
+    while True:
+        responses = Telegram.read_group()
+        
+        # mensagens recebidas depois de enviar mensagem pedindo o codigo
+        msgs = [msg for msg, epoch in responses if epoch > epoch_start]
+        
+        # mais recente primeiro
+        msgs.reverse()
+            
+        if not len(msgs):
+            print("\n [Telegram]: Aguardando resposta...\n")
+            time.sleep(30)
+            continue
 
+        # retorna ultima mensagem recebida
+        code = msgs[0]
+        Telegram.send(f"Código recebido: '{code}'")
+        return code
+           
 
 def verificar_link(browser):
     '''

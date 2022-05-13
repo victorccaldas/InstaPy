@@ -28,6 +28,88 @@ from .util import (
 )
 from .xpath import read_xpath
 
+from .minhas_funcoes import waitPhoneConfirmationResponse
+
+def bypass_confirmation_code(
+    browser, logger, logfolder, bypass_security_challenge_using
+):
+    """Bypass suspicious loggin attempt verification."""
+
+    # close sign up Instagram modal if available
+    dismiss_get_app_offer(browser, logger)
+    dismiss_notification_offer(browser, logger)
+    dismiss_this_was_me(browser)
+
+
+    # click on security code
+    send_confirmation_button = browser.find_element(
+        By.XPATH,
+        read_xpath(bypass_confirmation_code.__name__, "send_confirmation_button"),
+    )
+    (ActionChains(browser).move_to_element(send_confirmation_button).click().perform())
+
+    assert "confirmation sent" in browser.title.lower()
+
+    confirmation_code = waitPhoneConfirmationResponse()
+
+    # update server calls
+    update_activity(browser, state=None)
+
+    logger.info("Instagram detected an unusual login attempt")
+    logger.info("A security code was sent to your phone number SMS")
+
+    security_code_field = browser.find_element(
+        By.XPATH, read_xpath(bypass_confirmation_code.__name__, "security_code_field")
+    )
+
+    (
+        ActionChains(browser)
+        .move_to_element(security_code_field)
+        .click()
+        .send_keys(confirmation_code)
+        .perform()
+    )
+
+    # update server calls for both 'click' and 'send_keys' actions
+    for _ in range(2):
+        update_activity(browser, state=None)
+
+    submit_security_code_button = browser.find_element(
+        By.XPATH,
+        read_xpath(bypass_confirmation_code.__name__, "submit_security_code_button"),
+    )
+
+    (
+        ActionChains(browser)
+        .move_to_element(submit_security_code_button)
+        .click()
+        .perform()
+    )
+
+    # update server calls
+    update_activity(browser, state=None)
+
+    try:
+        sleep(3)
+        # locate wrong security code message
+        wrong_login = browser.find_element(
+            By.XPATH, read_xpath(bypass_confirmation_code.__name__, "wrong_login")
+        )
+
+        if wrong_login is not None:
+            wrong_login_msg = "Wrong security code! Please check the code Instagram sent you and try again."
+            update_activity(
+                browser,
+                action=None,
+                state=wrong_login_msg,
+                logfolder=logfolder,
+                logger=logger,
+            )
+            logger.warning(wrong_login_msg)
+
+    except NoSuchElementException:
+        # correct security code
+        pass
 
 def bypass_suspicious_login(
     browser, logger, logfolder, bypass_security_challenge_using
@@ -459,7 +541,6 @@ def login_user(
     # check for login error messages and display it in the logs
 
     if "instagram.com/challenge" in browser.current_url:
-        # sendPhoneConfirmationAndWaitResponse() # a escrever.
         print("\n[BLOCK] PHONE CHALLENGE BLOCK DETECTED ========================")
         # check if account is disabled by Instagram,
         # or there is an active challenge to solve
@@ -501,25 +582,19 @@ def login_user(
         except NoSuchElementException:
             pass
 
-        # in case instagram asks the user to update phone for Instagram account
+        # se pedir pra confirmar o numero de telefone
         '''try:
             browser.find_element(
                 By.XPATH, read_xpath(login_user.__name__, "update_phone_number")
             )
-            challenge_warn_msg = (
-                "Instagram initiated a challenge before allow your account to login. "
-                "At the moment there isn't a phone number linked to your Instagram "
-                "account. Please, add a phone number to your account, and try again."
-            )
-            logger.warning(challenge_warn_msg)
             update_activity(
                 browser,
                 action=None,
-                state=challenge_warn_msg,
+                state="Trying to solve phone confirmation",
                 logfolder=logfolder,
                 logger=logger,
             )
-            return False
+            bypass_confirmation_code(browser, logger, logfolder, security_code_to_phone)
         except NoSuchElementException:
             pass'''
 

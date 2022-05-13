@@ -24,6 +24,13 @@ xpath["bypass_suspicious_login"] = {
     "wrong_login": "//p[text()='Please check the code we sent you and try again.']",
 }
 
+xpath["bypass_confirmation_code"] = {
+    "send_confirmation_button": "//button[text()='Send Confirmation']",
+    "submit_security_code_button": "//button[text()='Submit']",
+    "wrong_login": "//p[text()='Please check the code we sent you and try again.']",
+
+}
+
 xpath["dismiss_this_was_me"] = {
     "this_was_me_button": "//button[@name='choice'][text()='This Was Me']"
 }
@@ -180,9 +187,9 @@ xpath["login_user"] = {
     "response_code": "//span[@id='code']",
     "account_disabled": "//p[contains(text(),'Your account has been disabled')]",
     "add_phone_number": "//h2[text()='Add Your Phone Number']",
-    "suspicious_login_attempt": "//*[contains(text(),'Add Phone Number')]",
-    #"update_phone_number": "//*[contains(text(),'Add Phone Number')]",
-    #"suspicious_login_attempt": "//p[text()='Suspicious Login Attempt']",
+    "suspicious_login_attempt": "//*[contains(text(),'Add Phone Number')]", # remover
+    #"update_phone_number": "//*[contains(text(),'Add Phone Number')]", # retomar
+    #"suspicious_login_attempt": "//p[text()='Suspicious Login Attempt']", # retomar
     "error_alert": "//p[@id='slfErrorAlert']",
     "verification_code": "//input[@name='verificationCode']",
     "confirm": "//button[text()='Confirm']",
