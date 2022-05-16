@@ -1995,7 +1995,7 @@ def is_page_available(browser, logger):
                     # add if & add 's' no elements
                 elif browser.find_elements(By.XPATH, read_xpath("page_errors", "instaBlock")):
                     print("\n\n[BLOCK] Bloqueio do insta - soft! interrompendo execução ~~~~~~~~~~~~~~~~~~~~~~~~")
-                    raise StopIteration("Bloqueio de acesso aos perfis. Interrompendo tarefa")
+                    raise StopIteration("[BLOCK] Bloqueio de acesso aos perfis. Interrompendo tarefa")
                     #except Exception as e:
                 else:
                     print("Erro não reconhecido. Possivel block de usuário ??")

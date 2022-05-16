@@ -1208,6 +1208,7 @@ class InstaPy:
                 continue
 
             if not users_validated:
+                print("[Debug] validando usuários")
                 # Verify if the user should be followed
                 validation, details = self.validate_user_call(acc_to_follow)
                 if validation is not True or acc_to_follow == self.username:
@@ -1230,6 +1231,7 @@ class InstaPy:
             if not follow_restriction(
                 "read", acc_to_follow, self.follow_times, self.logger
             ):
+                print("[Debug] follow_user ...")
                 follow_state, msg = follow_user(
                     self.browser,
                     "profile",
@@ -1243,6 +1245,7 @@ class InstaPy:
                 sleep(random.randint(1, 3))
 
                 if follow_state is True:
+                    print("[Debug] Follow confirmado!")
                     followed_all += 1
                     followed_new += 1
                     # reset jump counter after a successful follow
@@ -1283,6 +1286,8 @@ class InstaPy:
                 elif msg == "jumped":
                     # will break the loop after certain consecutive jumps
                     self.jumps["consequent"]["follows"] += 1
+                else:
+                    print("[Debug] #1 :", msg)
 
                 sleep(1)
 

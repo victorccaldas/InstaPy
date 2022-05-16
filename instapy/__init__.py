@@ -2,7 +2,7 @@
 
 # __variables__ with double-quoted values will be available in setup.py
 __version__ = "0.6.16"
-# TESTE 5
+# Commit 16/05/22 2:05
 from .instapy import InstaPy
 from .util import smart_run
 from .settings import Settings

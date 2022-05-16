@@ -571,7 +571,7 @@ def follow_user(browser, track, login, user_name, button, blacklist, logger, log
                 browser, "follow", track, login, user_name, None, logger, logfolder
             )
             if follow_state is not True:
-                print("\n[BLOCK] Não seguiu!!\n")
+                print("\n[Debug BLOCK] Não seguiu!!\n")
                 return False, msg
             else:
                 print("\n[Debug] Seguiu com sucesso!!\n")
@@ -613,6 +613,7 @@ def follow_user(browser, track, login, user_name, button, blacklist, logger, log
                 )
                 return False, "unexpected failure"
     elif track == "dialog":
+        print("[Debug] track == dialog")
         click_element(browser, button)
         sleep(3)
 
