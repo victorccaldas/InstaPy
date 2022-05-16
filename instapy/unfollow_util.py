@@ -571,8 +571,10 @@ def follow_user(browser, track, login, user_name, button, blacklist, logger, log
                 browser, "follow", track, login, user_name, None, logger, logfolder
             )
             if follow_state is not True:
-                print("[BLOCK] Não seguiu!!")
+                print("\n[BLOCK] Não seguiu!!\n")
                 return False, msg
+            else:
+                print("\n[Debug] Seguiu com sucesso!!\n")
 
         elif following_status in ["Following", "Requested"]:
             if following_status == "Following":
@@ -1561,7 +1563,7 @@ def verify_action(
                     "failure!".format(action)
                 )
                 return False, "unexpected"
-
+            print("\n[Debug] \nStatus: {}\nButton change: {}".format(following_status, button_change))
             if button_change:
                 break
             else:
