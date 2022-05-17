@@ -60,18 +60,19 @@ def get_following_status(
                 return "UNAVAILABLE", None
 
         # wait until the follow button is located and visible, then get it
+        # Deixar verificação do follow button por ultimo: devido à presença de follow buttons
+        # quando existe a janelinha do Suggestions for You
         try:
-            browser.find_element(
-                By.XPATH, read_xpath(get_following_status.__name__, "follow_button_XP")
+            follow_button = browser.find_element(
+                By.XPATH,
+                read_xpath(get_following_status.__name__, "follow_span_XP_following"),
             )
-            follow_button_XP = read_xpath(get_following_status.__name__, "follow_button_XP")
+            return "Following", follow_button
         except NoSuchElementException:
             try:
-                follow_button = browser.find_element(
-                    By.XPATH,
-                    read_xpath(get_following_status.__name__, "follow_span_XP_following"),
-                )
-                return "Following", follow_button
+                follow_button_XP = read_xpath(get_following_status.__name__, "follow_button_XP")
+                browser.find_element(By.XPATH, follow_button_XP)
+
             except NoSuchElementException:
                 return "UNAVAILABLE", None
 

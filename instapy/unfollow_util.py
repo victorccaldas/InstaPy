@@ -1571,8 +1571,9 @@ def verify_action(
                 try:
                     if retry_count == 1:
                         reload_webpage(browser)
-                        sleep(4)
 
+                        sleep(random.randint(4, 7)+random.random())
+                        
                     elif retry_count == 2:
                         # handle it!
                         # try to do the action one more time!
@@ -1581,7 +1582,8 @@ def verify_action(
                         if action == "unfollow":
                             confirm_unfollow(browser)
 
-                        sleep(4)
+                        sleep(random.randint(4, 7)+random.random())
+
                     elif retry_count == 3:
                         user_link = "https://www.instagram.com/{}/".format(person)
                         web_address_navigator(browser, user_link)
@@ -1593,8 +1595,13 @@ def verify_action(
                             button.click()
                         except:
                             return False, "unexpected"
-                        sleep(random.randint(4, 7))
-                        return True, "success"
+                        sleep(random.randint(4, 7)+random.random())
+                        browser.refresh()
+                        
+                        # [DEBUG] O problema tá aqui: ele clica e retorna que deu certo
+                        '''#  
+                        print("[Debug] Terceiro retry. Sucesso!! ")
+                        return True, "success"'''
 
                     elif retry_count == 4:
                         logger.warning(
@@ -1604,15 +1611,16 @@ def verify_action(
                         )
                         sleep(210)
                         return False, "temporary block"
+
                 except Exception as e:
                     else_trys +=1
                     if else_trys > 3:
                         print("Deixando exceção ocorrer...")
                         raise e
 
-
         logger.info("Last {} is verified after reloading the page!".format(action))
 
+    print("[Debug] finalizando verificação. Sucesso!! ")
     return True, "success"
 
 
