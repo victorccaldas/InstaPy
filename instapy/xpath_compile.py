@@ -224,7 +224,8 @@ xpath["accept_igcookie_dialogue"] = {"accept_button": "//button[text()='Accept']
 # meus
 xpath["page_errors"] = {
     "inexistent": "//*[contains(text(), 'The link you followed may be broken')]",
-    "instaBlock": "//*[contains(text(), 'Please wait a few minutes before you try again')]",
+    "instaBlock": "//*[contains(text(), 'Please wait a few minutes before you try again' or \
+                                text(), 'Try Again Later')]",
     "userBlock": '?',
     "confirmNumberButton": "//button[contains(text(), 'Send confirmation')]",
 }

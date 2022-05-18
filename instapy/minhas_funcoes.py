@@ -9,6 +9,7 @@ import time
 from . import util
 from . import instapy
 from . import xpath_compile
+from . import xpath
 
 # achar o caminho relativo do insta_bot e importar.
 '''from inspect import getsourcefile
@@ -85,8 +86,14 @@ def verificar_link(browser):
     '''
     url = util.get_current_url(browser)
 
+    if browser.find_elements(By.XPATH, xpath.read_xpath("page_errors", "instaBlock")):
+        print("\n################ Bloqueio Try Again Later !! ################\n")
+        raise StopIteration("[Block] - Try Again Later: Bloqueado pelo Instagram.")
+
+
     if '/challenge' in url:
         print("################ !!! Challenge detectado !!! ################")
+        print("(Em outra função) vai executar waitPhoneConfirmationResponse")
         return
         #1. Função pra clicar no botão de SMS ou Email pra enviar;
         #2. Função pra pedir o codigo de verificação por Telegram e enviar print da tela (apenas pra debug?), 
