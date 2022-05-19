@@ -86,13 +86,18 @@ def verificar_link(browser):
     '''
     url = util.get_current_url(browser)
 
-    if browser.find_elements(By.XPATH, xpath.read_xpath("page_errors", "instaBlock")):
-        print("\n################ Bloqueio Try Again Later !! ################\n")
-        raise StopIteration("[Block] - Try Again Later: Bloqueado pelo Instagram.")
+
+    if browser.find_elements(By.XPATH, xpath.read_xpath("page_errors", "profileBlock")):
+        raise StopIteration("[BLOCK] Bloqueio do insta de acesso ao perfil. Interrompendo tarefa")
 
 
-    if '/challenge' in url:
-        print("################ !!! Challenge detectado !!! ################")
+    elif browser.find_elements(By.XPATH, xpath.read_xpath("page_errors", "unfollowBlock")):
+        print("\n Bloqueio Try Again Later !! n")
+        raise StopIteration("[Block] - Try Again Later: Unfollow bloqueado pelo Instagram.")
+
+
+    elif '/challenge' in url:
+        print(" !!! Challenge detectado !!! ")
         print("(Em outra função) vai executar waitPhoneConfirmationResponse")
         return
         #1. Função pra clicar no botão de SMS ou Email pra enviar;
@@ -103,8 +108,8 @@ def verificar_link(browser):
         # email = automatizável porém exige credenciais
         # sms = mais rápido pra ser respondido manualmente
     
-    if '/login' in url:
-        print("################ !!! Deslog detectado !!! ################")
+    elif '/login' in url:
+        print("!!! Deslog detectado !!!")
         
         raise instapy.DeslogError("Deslog detectado")
 

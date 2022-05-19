@@ -501,7 +501,7 @@ def getUserData(
             break
 
     if not shared_data:
-        raise StopIteration("[BLOCK] Dados do self-usuário inacessíveis. (Provável bloqueio do Insta)")
+        raise StopIteration("[BLOCK] Dados do self-usuário inacessíveis. (Bloqueio do Insta de acesso a perfis)")
 
     # fetches all data needed
     get_key = shared_data.get("entry_data").get("ProfilePage")
@@ -519,8 +519,18 @@ def getUserData(
             try:
                 data = data[subobject]
             except TypeError as e:
-                raise DeslogError("[BLOCK] Deslog ocorreu no login. Tentando novamente..."
-                                    "\nErro: \n"+str(e))
+                page_title = str(browser.title).lower()
+                print("Debug: ", page_title)
+                verificar_link()
+                print("Erro desconhecido: ", e) # só entra aqui se não raise nada em verificar_link
+
+                '''if 'login' in page_title: 
+                    raise DeslogError("[BLOCK] Deslog ocorreu no login. Tentando novamente...")
+                elif '' in page_title:
+                    raise StopIteration("[Block] Bloqueio de acesso ao perfil do usuário.")
+                else:
+                    print("Debug - erro desconhecido:")
+                    raise e'''
     return data
 
 
@@ -1993,7 +2003,7 @@ def is_page_available(browser, logger):
                     #try:
                         # Ta caindo dentro do try, raising exception e dps caindo no except. E não parando a execução.
                     # add if & add 's' no elements
-                elif browser.find_elements(By.XPATH, read_xpath("page_errors", "instaBlock")):
+                elif browser.find_elements(By.XPATH, read_xpath("page_errors", "profileBlock")):
                     print("\n\n[BLOCK] Bloqueio do insta - soft! interrompendo execução ~~~~~~~~~~~~~~~~~~~~~~~~")
                     raise StopIteration("[BLOCK] Bloqueio de acesso aos perfis. Interrompendo tarefa")
                     #except Exception as e:

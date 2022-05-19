@@ -1231,7 +1231,6 @@ class InstaPy:
             if not follow_restriction(
                 "read", acc_to_follow, self.follow_times, self.logger
             ):
-                print("[Debug] follow_user ...")
                 follow_state, msg = follow_user(
                     self.browser,
                     "profile",
@@ -1288,6 +1287,7 @@ class InstaPy:
                     self.jumps["consequent"]["follows"] += 1
                 else:
                     print("[Debug] #1 :", msg)
+                    
 
                 sleep(1)
 

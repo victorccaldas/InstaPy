@@ -563,7 +563,7 @@ def follow_user(browser, track, login, user_name, button, blacklist, logger, log
         )
 
         # Verificar se está corretamente na página do perfil
-        verificar_link(browser) # pois inclui dentro da web_address_navigator
+        verificar_link(browser)
 
         if following_status in ["Follow", "Follow Back"]:
             click_visibly(browser, follow_button)  # click to follow
@@ -571,8 +571,8 @@ def follow_user(browser, track, login, user_name, button, blacklist, logger, log
                 browser, "follow", track, login, user_name, None, logger, logfolder
             )
             if follow_state is not True:
-                print("\n[Debug BLOCK] Não seguiu!!\n")
-                return False, msg
+                raise StopIteration("[Block] Não seguiu o usuário !") 
+                # return False, msg
             else:
                 print("\n[Debug] Seguiu com sucesso!!\n")
 
@@ -1564,7 +1564,6 @@ def verify_action(
                     "failure!".format(action)
                 )
                 return False, "unexpected"
-            print("\n[Debug] \nStatus: {}\nButton change: {}".format(following_status, button_change))
             if button_change:
                 break
             else:
@@ -1593,15 +1592,12 @@ def verify_action(
                         button = browser.find_element(By.XPATH, follow_button_xp)
                         try:
                             button.click()
-                        except:
+                        except Exception as e:
+                            print("[Debug] Titulo da pagina: {}".format(browser.title))
+                            print("[Debug] Erro ao clicar no botão: {}".format(e))
                             return False, "unexpected"
                         sleep(random.randint(4, 7)+random.random())
                         browser.refresh()
-                        
-                        # [DEBUG] O problema tá aqui: ele clica e retorna que deu certo
-                        '''#  
-                        print("[Debug] Terceiro retry. Sucesso!! ")
-                        return True, "success"'''
 
                     elif retry_count == 4:
                         logger.warning(
@@ -1618,9 +1614,9 @@ def verify_action(
                         print("Deixando exceção ocorrer...")
                         raise e
 
+        print("\n[Debug] \nStatus: {}\nButton change: {}".format(following_status, button_change))
         logger.info("Last {} is verified after reloading the page!".format(action))
 
-    print("[Debug] finalizando verificação. Sucesso!! ")
     return True, "success"
 
 
