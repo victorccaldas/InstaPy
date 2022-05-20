@@ -225,6 +225,6 @@ xpath["accept_igcookie_dialogue"] = {"accept_button": "//button[text()='Accept']
 xpath["page_errors"] = {
     "inexistent": "//*[contains(text(), 'The link you followed may be broken')]",
     "profileBlock": "//*[contains(text(), 'Please wait a few minutes before you try again')]",
-    "unfollowBlock": "//*[contains(text(), 'Try Again Later')",
+    "unfollowBlock": "//*[contains(text(), 'Try Again Later')]",
     "confirmNumberButton": "//button[contains(text(), 'Send confirmation')]",
 }
