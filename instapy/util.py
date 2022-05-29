@@ -521,7 +521,7 @@ def getUserData(
             except TypeError as e:
                 page_title = str(browser.title).lower()
                 print("Debug: ", page_title)
-                verificar_link()
+                verificar_link(browser)
                 print("Erro desconhecido: ", e) # só entra aqui se não raise nada em verificar_link
 
                 '''if 'login' in page_title: 
