@@ -2,6 +2,7 @@
 
 # __variables__ with double-quoted values will be available in setup.py
 __version__ = "0.6.19"
+print("Versão Instapy:", __version__)
 
 from .instapy import InstaPy
 from .util import smart_run
