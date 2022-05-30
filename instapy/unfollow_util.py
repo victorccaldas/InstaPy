@@ -1332,6 +1332,9 @@ def unfollow_user(
     if quota_supervisor("unfollows") == "jump":
         return False, "jumped"
 
+    print("[debug] verificar_link")
+    verificar_link(browser)
+
     if track in ["profile", "post"]:
         # Method of unfollowing from a user's profile page or post page
         if track == "profile":
@@ -1387,6 +1390,8 @@ def unfollow_user(
                 # Trace the current status
                 failure_msg = following_status
 
+            browser.save_screenshot("debug_couldnt_unfollow.png")
+            print("[DEBUG] se esta mensagem for recorrente, verificar_link acima não tá detectando o problema.")
             logger.warning(
                 "--> Couldn't unfollow '{}'!\t~{}".format(person, failure_msg)
             )
@@ -1480,6 +1485,7 @@ def post_unfollow_cleanup(
     if "uncertain" in state:
         # this user was found in our unfollow list but currently is not
         # being followed
+        # OR unfollow may have failed.
         logtime = get_log_time()
         log_uncertain_unfollowed_pool(
             username, person, logger, logfolder, logtime, person_id
