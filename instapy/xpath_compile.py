@@ -157,7 +157,8 @@ xpath["get_source_link"] = {
 
 xpath["get_users_through_dialog"] = {"find_dialog_box": "//body/div[4]/div/div[2]"}
 
-xpath["is_private_profile"] = {"is_private": '//h2[@class="_kcrwx"]'}
+#xpath["is_private_profile"] = {"is_private": '//h2[@class="_kcrwx"]'}
+xpath["is_private_profile"] = {"is_private": '//h2[@class="rkEop"]'}
 
 xpath["like_comment"] = {
     "comments_block": "//*[contains(@class,'EtaWk')]",
@@ -219,6 +220,7 @@ xpath["likers_from_photo"] = {
 }
 
 xpath["accept_igcookie_dialogue"] = {"accept_button": "//button[text()='Accept']"}
+#xpath["accept_igcookie_dialogue"] = {"accept_button": "//button[text()='Allow essential and optional cookies']"}
 
 
 # meus

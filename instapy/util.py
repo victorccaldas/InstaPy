@@ -520,7 +520,7 @@ def getUserData(
                 data = data[subobject]
             except TypeError as e:
                 page_title = str(browser.title).lower()
-                print("Debug: ", page_title)
+                print("\n[Debug] ", page_title,'\n')
                 verificar_link(browser)
                 print("Erro desconhecido: ", e) # só entra aqui se não raise nada em verificar_link
 
@@ -2686,6 +2686,13 @@ def get_additional_data(browser):
         if re.search("^window.__additionalDataLoaded", text):
             additional_data = json.loads(re.search("{.*}", text).group())
             break
+    # Salvar page source se dados não forem encontrados
+    if not additional_data:
+        with open("page_source_additionaldata.html", "w") as file:
+            file.write(browser.page_source)
+        print("\n[Debug] Dados do Código fonte indisponíveis!! (additional_data)\n")
+    else:
+        print("\n[Debug] Código fonte lido corretamente.\n")
 
     return additional_data
 
@@ -2704,5 +2711,14 @@ def get_shared_data(browser):
         if re.search("^window._sharedData", text):
             shared_data = json.loads(re.search("{.*}", text).group())
             break
+
+    # Salvar page source se dados não forem encontrados
+    if not shared_data:
+        with open("page_source_shareddata.html", "w") as file:
+            file.write(browser.page_source)
+        print("\n[Debug] Dados do Código fonte indisponíveis!! (shared_data)\n")
+    else:
+        print("\n[Debug] Código fonte lido corretamente.\n")
+
 
     return shared_data

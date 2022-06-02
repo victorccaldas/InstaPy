@@ -407,7 +407,7 @@ def unfollow(
 
                 if person not in dont_include:
                     logger.info(
-                        "Ongoing Unfollow [{}/{}]: now unfollowing '{}'...".format(
+                        "\nOngoing Unfollow [{}/{}]: now unfollowing '{}'...".format(
                             unfollow_num + 1, amount, person.encode("utf-8")
                         )
                     )
@@ -613,12 +613,12 @@ def follow_user(browser, track, login, user_name, button, blacklist, logger, log
                 )
                 return False, "unexpected failure"
     elif track == "dialog":
-        print("[Debug] track == dialog")
+        print("\n[Debug] track == dialog\n")
         click_element(browser, button)
         sleep(3)
 
     # general tasks after a successful follow
-    print("[Debug] Entrando aqui mesmo quando não segue!")
+    print("\n[Debug] Entrando aqui mesmo quando não segue!\n")
     logger.info("--> Followed '{}'!".format(user_name.encode("utf-8")))
     Event().followed(user_name)
     update_activity(
@@ -835,7 +835,7 @@ def get_users_through_dialog_with_graphql(
 
         #     simulator_counter = 0
 
-    print("[DEBUG] Qtd. de páginas de dados de seguidores buscadas: ", page_counter, '--------------------------------------------------')
+    print("\n[DEBUG] Qtd. de páginas de dados de seguidores buscadas: ", page_counter, '--------------------------------------------------\n')
 
     # shuffle it if randomize is enable
     if randomize:
@@ -1332,7 +1332,6 @@ def unfollow_user(
     if quota_supervisor("unfollows") == "jump":
         return False, "jumped"
 
-    print("[debug] verificar_link")
     verificar_link(browser)
 
     if track in ["profile", "post"]:
@@ -1391,7 +1390,7 @@ def unfollow_user(
                 failure_msg = following_status
 
             browser.save_screenshot("debug_couldnt_unfollow.png")
-            print("[DEBUG] se esta mensagem for recorrente, verificar_link acima não tá detectando o problema.")
+            print("\n[DEBUG] se esta mensagem for recorrente, verificar_link acima não tá detectando o problema.\n")
             logger.warning(
                 "--> Couldn't unfollow '{}'!\t~{}".format(person, failure_msg)
             )
@@ -1486,6 +1485,7 @@ def post_unfollow_cleanup(
         # this user was found in our unfollow list but currently is not
         # being followed
         # OR unfollow may have failed.
+        print("\n[Debug] Unfollow incerto.\n")
         logtime = get_log_time()
         log_uncertain_unfollowed_pool(
             username, person, logger, logfolder, logtime, person_id
@@ -1599,8 +1599,9 @@ def verify_action(
                         try:
                             button.click()
                         except Exception as e:
-                            print("[Debug] Titulo da pagina: {}".format(browser.title))
+                            print("\n[Debug] Titulo da pagina: {}".format(browser.title))
                             print("[Debug] Erro ao clicar no botão: {}".format(e))
+                            print('')
                             return False, "unexpected"
                         sleep(random.randint(4, 7)+random.random())
                         browser.refresh()
@@ -1620,7 +1621,7 @@ def verify_action(
                         print("Deixando exceção ocorrer...")
                         raise e
 
-        print("\n[Debug] \nStatus: {}\nButton change: {}".format(following_status, button_change))
+        #print("\n[Debug] \nStatus: {}\nButton change: {}".format(following_status, button_change))
         logger.info("Last {} is verified after reloading the page!".format(action))
 
     return True, "success"

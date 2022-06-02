@@ -34,7 +34,8 @@ def sleep(t, custom_percentage=None):
     if custom_percentage is None:
         custom_percentage = sleep_percentage
     time = randomize_time(t) * custom_percentage
-    instapy.logger.info("Sleeping about ~{:.3f} seconds".format(time))
+    if time >= 5:
+        instapy.logger.info("Sleeping about ~{:.3f} seconds".format(time))
     original_sleep(time)
 
 

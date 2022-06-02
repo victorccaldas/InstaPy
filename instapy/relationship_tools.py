@@ -273,8 +273,10 @@ def get_followers(
 
                 # take breaks gradually
                 if sc_rolled > 91:
-                    logger.info("Queried too much! ~ sleeping a bit :>")
-                    sleep(600)
+                    # adicionar 40% chance se não esperar
+                    if random.random() < 0.6:
+                        logger.info("Queried too much! ~ sleeping a bit :>")
+                        sleep(600)
                     sc_rolled = 0
 
     except BaseException as exc:
@@ -566,8 +568,9 @@ def get_following(
 
                 # take breaks gradually
                 if sc_rolled > 91:
-                    logger.info("Queried too much! ~ sleeping a bit :>")
-                    sleep(600)
+                    if random.random() < 0.6:
+                        logger.info("Queried too much! ~ sleeping a bit :>")
+                        sleep(600)
                     sc_rolled = 0
 
     except BaseException as exc:

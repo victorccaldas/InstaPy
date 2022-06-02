@@ -591,6 +591,7 @@ def check_link(
 
     if post_page is None:
         logger.warning("Unavailable Page: {}".format(post_link.encode("utf-8")))
+        browser.save_screenshot('./debug_unavailable_page.png')
         return True, None, None, "Unavailable Page", "Failure"
     
     location_name = None
@@ -838,7 +839,7 @@ def verify_liked_image(browser, logger):
         return True
     else:
         logger.warning("--> Image was NOT liked! You have a BLOCK on likes!")
-        print("Debug: tirando screenshot do like-block... -> screenshot_debug_likeblock.png")
+        print("\n[Debug] Tirando screenshot do like-block... -> screenshot_debug_likeblock.png\n")
         browser.save_screenshot("screenshot_debug_likeblock.png")
         # Primeiro debug: Foi devido a Deslog!!
         return False
@@ -886,9 +887,9 @@ def get_links(browser, page, logger, media, element):
                         logger.info("Found media type: {}".format(MEDIA_PHOTO))
                         links.append(post_href)
 
-                    if len(post_elem) == 2:
+                    elif len(post_elem) == 2:
                         logger.info(
-                            "Found media type: {} - {} - {}".format(
+                            "Found media type: {} or {} or {}".format(
                                 MEDIA_CAROUSEL, MEDIA_VIDEO, MEDIA_IGTV
                             )
                         )
@@ -900,7 +901,8 @@ def get_links(browser, page, logger, media, element):
                             By.XPATH,
                             "//a[@href='/p/"
                             + post_href.split("/")[-2]
-                            + "/']/div[contains(@class,'CzVzU')]/child::*/*[name()='svg']",
+                            #+ "/']/div[contains(@class,'CzVzU')]/child::*/*[name()='svg']",
+                            + "/']/div[contains(@class,'_aatp')]/child::*/*[name()='svg']", # _aatp = xpath da barrinha que mostra carrossel ou video
                         ).get_attribute("aria-label")
 
                         logger.info("Post category: {}".format(post_category))
