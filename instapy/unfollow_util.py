@@ -5,6 +5,7 @@ import json
 import os
 import random
 import sqlite3
+import requests
 from datetime import datetime, timedelta
 from math import ceil
 
@@ -677,14 +678,68 @@ def get_users_through_dialog_with_graphql(
     if randomize and amount >= 3:
         # expanding the population for better sampling distribution
         amount = amount * 1.9
+    
+    # get user ID
+    # https://commentpicker.com/instagram-username.php can find
+    # other methods:
+    # https://www.instagram.com/web/search/topsearch/?context=blended&query=+<username>+&rank_token=0.3953592318270893&count=1
+    # https://www.instagram.com/web/search/topsearch/?query=<username>
+    # https://www.instagram.com/<username>/channel/?__a=1' # esse deve ter um user agent válido com curl ex.: curl -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36" 
+    # https://www.instagram.com/<username>/?__a=1'
+
     try:
         user_id = browser.execute_script(
             "return window.__additionalData[Object.keys(window.__additionalData)[0]].data.graphql.user.id"
         )
+        print("[debug] user_id 1")
     except WebDriverException:
-        user_id = browser.execute_script(
-            "return window._sharedData.entry_data.ProfilePage[0].graphql.user.id"
-        )
+        try:
+            user_id = browser.execute_script(
+                "return window._sharedData.entry_data.ProfilePage[0].graphql.user.id"
+            )
+            print("[debug] user_id 2")
+
+        except WebDriverException:
+            ### eu escrevi daqui pra baixo (com copilot)
+            try:
+                user_id = browser.execute_script(
+                    "return window.__additionalData.rhx_cmt.user.id"
+                )
+                print("[debug] user_id 3")
+
+            except WebDriverException:
+                try:
+                    user_id = browser.execute_script(
+                        "return window.__additionalData.graphql.short_code_media.owner.id"
+                    )
+                    print("[debug] user_id 4")
+                except WebDriverException:
+                    try:
+                        user_id = browser.execute_script(
+                            "return window.__additionalData.entry_data.PostPage[0].graphql.shortcode_media.owner.id"
+                        )
+                        print("[debug] user_id 5")
+                    except WebDriverException:
+                        try:
+                            user_id = browser.execute_script(
+                                "return window.__additionalData.entry_data.ProfilePage[0].graphql.user.id"
+                            )
+                            print("[debug] user_id 6")
+                        except WebDriverException:
+                            # Alternativamente, obter ID
+                            try:
+                                username = browser.current_url.split("/")[-2]
+                                req = requests.get(f'https://instagram.com/{username}/?__a=1')
+                                user_id = req.json()['graphql']['user']['id']
+                                print("[debug] user_id 7")
+                            except WebDriverException:
+                                user_id = None
+                                logger.warning(
+                                    "Failed to get user ID while getting users from dialog!"
+                                )
+
+    
+
 
     # There are two query hash, one for followers and following, ie:
     # t="c76146de99bb02f6415203be841dd25a",n="d04b0a864b4b54837c0d870b0e77e076"

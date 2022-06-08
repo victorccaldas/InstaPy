@@ -117,13 +117,11 @@ def get_followers(
 
     try:
         user_data["id"] = browser.execute_script(
-            "return window.__additionalData[Object.keys(window.__additionalData)[0]].data."
-            "graphql.user.id"
-        )
+            "return window.__additionalData[Object.keys(window.__additionalData)[0]].data.graphql.user.id")
+
     except WebDriverException:
         user_data["id"] = browser.execute_script(
-            "return window._sharedData.entry_data.ProfilePage[0].graphql.user.id"
-        )
+            "return window._sharedData.entry_data.ProfilePage[0].graphql.user.id")
 
     variables["id"] = user_data["id"]
     variables["first"] = 50

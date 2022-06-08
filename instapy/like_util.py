@@ -591,6 +591,7 @@ def check_link(
 
     if post_page is None:
         logger.warning("Unavailable Page: {}".format(post_link.encode("utf-8")))
+        print("[Debug] erro, salvando screenshot")
         browser.save_screenshot('./debug_unavailable_page.png')
         return True, None, None, "Unavailable Page", "Failure"
     
