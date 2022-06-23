@@ -20,6 +20,7 @@ from .util import (
     progress_tracker,
     truncate_float,
     web_address_navigator,
+    find_user_data,
 )
 
 
@@ -115,13 +116,16 @@ def get_followers(
         graphql_endpoint + "?query_hash=37479f2b8209594dde7facb0d904896a"
     )
 
-    try:
+    user_data['id'] = find_user_data(browser=browser, username_or_link=username)['id']
+
+    '''try:
         user_data["id"] = browser.execute_script(
             "return window.__additionalData[Object.keys(window.__additionalData)[0]].data.graphql.user.id")
 
     except WebDriverException:
         user_data["id"] = browser.execute_script(
             "return window._sharedData.entry_data.ProfilePage[0].graphql.user.id")
+    '''# Comentado por mim
 
     variables["id"] = user_data["id"]
     variables["first"] = 50
@@ -409,7 +413,9 @@ def get_following(
         graphql_endpoint + "?query_hash=58712303d941c6855d4e888c5f0cd22f"
     )
 
-    try:
+    user_data['id'] = find_user_data(browser=browser, username_or_link=username)['id']
+
+    '''try:
         user_data["id"] = browser.execute_script(
             "return window.__additionalData[Object.keys(window.__additionalData)[0]].data."
             "graphql.user.id"
@@ -417,7 +423,7 @@ def get_following(
     except WebDriverException:
         user_data["id"] = browser.execute_script(
             "return window._sharedData.entry_data.ProfilePage[0].graphql.user.id"
-        )
+        )''' # Comentado por mim
 
     variables["id"] = user_data["id"]
     variables["first"] = 50

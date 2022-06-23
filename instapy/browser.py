@@ -4,7 +4,8 @@ import zipfile
 import shutil
 
 from os.path import sep
-from selenium import webdriver
+#from selenium import webdriver
+from seleniumwire import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options as Firefox_Options
 from selenium.webdriver import Remote

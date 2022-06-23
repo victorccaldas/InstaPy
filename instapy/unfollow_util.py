@@ -37,7 +37,7 @@ from .util import (
     click_visibly,
     delete_line_from_file,
     emergency_exit,
-    find_user_id,
+    find_user_data,
     format_number,
     get_action_delay,
     get_epoch_time_diff,
@@ -655,7 +655,7 @@ def scroll_to_bottom_of_followers_list(browser):
 def get_users_through_dialog_with_graphql(
     browser,
     login,
-    user_name,
+    username,
     amount,
     users_count,
     randomize,
@@ -687,59 +687,35 @@ def get_users_through_dialog_with_graphql(
     # https://www.instagram.com/<username>/channel/?__a=1' # esse deve ter um user agent válido com curl ex.: curl -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36" 
     # https://www.instagram.com/<username>/?__a=1'
 
-    try:
-        user_id = browser.execute_script(
-            "return window.__additionalData[Object.keys(window.__additionalData)[0]].data.graphql.user.id"
-        )
-        print("[debug] user_id 1")
-    except WebDriverException:
+    user_id = None
+    user_id = find_user_data(browser=browser, username_or_link=username)['id']
+
+    '''if not user_id:
         try:
             user_id = browser.execute_script(
-                "return window._sharedData.entry_data.ProfilePage[0].graphql.user.id"
+                "return window.__additionalData[Object.keys(window.__additionalData)[0]].data.graphql.user.id"
             )
-            print("[debug] user_id 2")
-
+            print("[debug] user_id 1")
         except WebDriverException:
-            ### eu escrevi daqui pra baixo (com copilot)
             try:
                 user_id = browser.execute_script(
-                    "return window.__additionalData.rhx_cmt.user.id"
+                    "return window._sharedData.entry_data.ProfilePage[0].graphql.user.id"
                 )
-                print("[debug] user_id 3")
+                print("[debug] user_id 2")
 
             except WebDriverException:
+                # Alternativamente, obter ID
                 try:
-                    user_id = browser.execute_script(
-                        "return window.__additionalData.graphql.short_code_media.owner.id"
-                    )
-                    print("[debug] user_id 4")
+                    username = browser.current_url.split("/")[-2]
+                    req = requests.get(f'https://instagram.com/{username}/?__a=1')
+                    user_id = req.json()['graphql']['user']['id']
+                    print("[debug] user_id 7")
                 except WebDriverException:
-                    try:
-                        user_id = browser.execute_script(
-                            "return window.__additionalData.entry_data.PostPage[0].graphql.shortcode_media.owner.id"
-                        )
-                        print("[debug] user_id 5")
-                    except WebDriverException:
-                        try:
-                            user_id = browser.execute_script(
-                                "return window.__additionalData.entry_data.ProfilePage[0].graphql.user.id"
-                            )
-                            print("[debug] user_id 6")
-                        except WebDriverException:
-                            # Alternativamente, obter ID
-                            try:
-                                username = browser.current_url.split("/")[-2]
-                                req = requests.get(f'https://instagram.com/{username}/?__a=1')
-                                user_id = req.json()['graphql']['user']['id']
-                                print("[debug] user_id 7")
-                            except WebDriverException:
-                                user_id = None
-                                logger.warning(
-                                    "Failed to get user ID while getting users from dialog!"
-                                )
-
-    
-
+                    user_id = None
+                    logger.warning(
+                        "Failed to get user ID while getting users from dialog!"
+                    )
+    ''' # Comentado por mim
 
     # There are two query hash, one for followers and following, ie:
     # t="c76146de99bb02f6415203be841dd25a",n="d04b0a864b4b54837c0d870b0e77e076"
@@ -1106,7 +1082,7 @@ def get_given_user_followers(
 def get_given_user_following(
     browser,
     login,
-    user_name,
+    username,
     amount,
     dont_include,
     randomize,
@@ -1132,9 +1108,9 @@ def get_given_user_following(
     :param logfolder: the logger folder
     :return: list of user's following
     """
-    user_name = user_name.strip().lower()
+    username = username.strip().lower()
 
-    user_link = "https://www.instagram.com/{}/".format(user_name)
+    user_link = "https://www.instagram.com/{}/".format(username)
     web_address_navigator(browser, user_link)
     valid_page = is_page_available(browser, logger)
     
@@ -1144,7 +1120,10 @@ def get_given_user_following(
 
     #  check how many people are following this user.
     #  throw RuntimeWarning if we are 0 people following this user
-    try:
+
+    allfollowing = find_user_data(browser, username)['edge_follow']['count']
+
+    '''try:
         # allfollowing = format_number(
         #    browser.find_element(By.XPATH, read_xpath(get_given_user_following.__name__,"all_following")).text)
         allfollowing = format_number(
@@ -1185,26 +1164,27 @@ def get_given_user_following(
                     else:
                         logger.info(
                             "Failed to get following count of '{}'  ~empty "
-                            "list".format(user_name)
+                            "list".format(username)
                         )
                         allfollowing = None
 
                 except (NoSuchElementException, IndexError):
                     logger.error(
                         "\nError occured during getting the following count "
-                        "of '{}'\n".format(user_name)
+                        "of '{}'\n".format(username)
                     )
                     return [], []
+    ''' # Comentado por mim
 
     # skip early for no followers
     if not allfollowing:
-        logger.info("'{}' has no any following".format(user_name))
+        logger.info("'{}' has no any following".format(username))
         return [], []
 
     elif allfollowing < amount:
         logger.warning(
             "'{}' has less following- {} than the desired amount of {}".format(
-                user_name, allfollowing, amount
+                username, allfollowing, amount
             )
         )
 
@@ -1212,7 +1192,7 @@ def get_given_user_following(
         following_link = browser.find_elements(
             By.XPATH,
             read_xpath(get_given_user_following.__name__, "following_link").format(
-                user_name
+                username
             ),
         )
         click_element(browser, following_link[0])
@@ -1220,7 +1200,7 @@ def get_given_user_following(
         update_activity(browser, state=None)
 
     except NoSuchElementException:
-        logger.error("Could not find following's link for '{}'".format(user_name))
+        logger.error("Could not find following's link for '{}'".format(username))
         return [], []
 
     except BaseException as e:
@@ -1232,7 +1212,7 @@ def get_given_user_following(
     person_list, simulated_list = get_users_through_dialog_with_graphql(
         browser,
         login,
-        user_name,
+        username,
         amount,
         allfollowing,
         randomize,
@@ -1578,7 +1558,7 @@ def get_user_id(browser, track, username, logger):
 
     if track != "dialog":  # currently do not get the user ID for follows
         # from 'dialog'
-        user_id = find_user_id(browser, track, username, logger)
+        user_id = find_user_data(browser, track, username, logger)['id']
 
     return user_id
 

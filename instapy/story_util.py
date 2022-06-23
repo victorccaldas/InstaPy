@@ -32,6 +32,10 @@ def get_story_data(browser, elem, action_type, logger, simulate=False):
     elem_id = ""
 
     if action_type == "user":
+        #reel_id = find_user_data(browser=browser, username_or_link=username)['id']
+
+        # Não modificado pois não uso e não tem dados de usuário na função
+        
         try:
             reel_id = browser.execute_script(
                 "return window.__additionalData[Object.keys(window.__additionalData)[0]].data.graphql.user.id"

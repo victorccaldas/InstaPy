@@ -33,7 +33,6 @@ from selenium.common.exceptions import (
     TimeoutException,
     WebDriverException,
 )
-from .exceptions import DeslogError
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
@@ -49,6 +48,7 @@ from .time_util import sleep, sleep_actual
 from .xpath import read_xpath
 
 from .minhas_funcoes import verificar_link
+from .exceptions import DeslogError
 from . import instapy
 
 
@@ -156,14 +156,16 @@ def validate_username(
     """Check if we can interact with the user"""
     # some features may not provide `username` and in those cases we will
     # get it from post's page.
-    if "/" in username_or_link:
+    username = find_user_data(browser=browser, username_or_link=username_or_link)['username']
+    
+    '''if "/" in username_or_link:
         link = username_or_link  # if there is a `/` in `username_or_link`,
         # then it is a `link`
 
         # check URL of the webpage, if it already is user's profile page,
         # then do not navigate to it again
         web_address_navigator(browser, link)
-
+        
         try:
             #todo: check if this section works
             #old "PostPage[0].graphql.shortcode_media.owner.username"
@@ -198,6 +200,9 @@ def validate_username(
     else:
         username = username_or_link  # if there is no `/` in
         # `username_or_link`, then it is a `username`
+    '''
+    if not username:
+        return False, "[Debug] Username couldn't be searched"
 
     if username == own_username:
         inap_msg = "--> Username '{}' is yours!\t~skipping user\n".format(own_username)
@@ -1209,110 +1214,116 @@ def get_relationship_counts(browser, username, logger):
     web_address_navigator(browser, user_link)
     valid_page = is_page_available(browser, logger)
     
-
-
+    user_data = find_user_data(browser=browser, username_or_link=username)
+    
     try:
-        followers_count = browser.execute_script(
-            "return window._sharedData.entry_data."
-            "ProfilePage[0].graphql.user.edge_followed_by.count"
-        )
-
-    except WebDriverException:
+        followers_count = user_data['edge_followed_by']['count']
+    except:
         try:
-            followers_count = format_number(
-                browser.find_element(
-                    By.XPATH,
-                    str(
-                        read_xpath(get_relationship_counts.__name__, "followers_count")
-                    ),
-                ).text
+            followers_count = browser.execute_script(
+                "return window._sharedData.entry_data."
+                "ProfilePage[0].graphql.user.edge_followed_by.count"
             )
-        except NoSuchElementException:
+
+        except WebDriverException:
             try:
-                browser.execute_script("location.reload()")
-                update_activity(browser, state=None)
-
-                followers_count = browser.execute_script(
-                    "return window._sharedData.entry_data."
-                    "ProfilePage[0].graphql.user.edge_followed_by.count"
-                )
-
-            except WebDriverException:
-                try:
-                    topCount_elements = browser.find_elements(
+                followers_count = format_number(
+                    browser.find_element(
                         By.XPATH,
-                        read_xpath(
-                            get_relationship_counts.__name__, "topCount_elements"
+                        str(
+                            read_xpath(get_relationship_counts.__name__, "followers_count")
                         ),
+                    ).text
+                )
+            except NoSuchElementException:
+                try:
+                    browser.execute_script("location.reload()")
+                    update_activity(browser, state=None)
+
+                    followers_count = browser.execute_script(
+                        "return window._sharedData.entry_data."
+                        "ProfilePage[0].graphql.user.edge_followed_by.count"
                     )
 
-                    if topCount_elements:
-                        followers_count = format_number(topCount_elements[1].text)
-                    else:
-                        logger.info(
-                            "Failed to get followers count of '{}'  ~empty "
-                            "list".format(username.encode("utf-8"))
+                except WebDriverException:
+                    try:
+                        topCount_elements = browser.find_elements(
+                            By.XPATH,
+                            read_xpath(
+                                get_relationship_counts.__name__, "topCount_elements"
+                            ),
+                        )
+
+                        if topCount_elements:
+                            followers_count = format_number(topCount_elements[1].text)
+                        else:
+                            logger.info(
+                                "Failed to get followers count of '{}'  ~empty "
+                                "list".format(username.encode("utf-8"))
+                            )
+                            followers_count = None
+
+                    except NoSuchElementException:
+                        logger.error(
+                            "Error occurred during getting the followers count "
+                            "of '{}'\n".format(username.encode("utf-8"))
                         )
                         followers_count = None
 
-                except NoSuchElementException:
-                    logger.error(
-                        "Error occurred during getting the followers count "
-                        "of '{}'\n".format(username.encode("utf-8"))
-                    )
-                    followers_count = None
-
     try:
-        following_count = browser.execute_script(
-            "return window._sharedData.entry_data."
-            "ProfilePage[0].graphql.user.edge_follow.count"
-        )
-
-    except WebDriverException:
+        followers_count = user_data['edge_follow']['count']
+    except:
         try:
-            following_count = format_number(
-                browser.find_element(
-                    By.XPATH,
-                    str(
-                        read_xpath(get_relationship_counts.__name__, "following_count")
-                    ),
-                ).text
+            following_count = browser.execute_script(
+                "return window._sharedData.entry_data."
+                "ProfilePage[0].graphql.user.edge_follow.count"
             )
 
-        except NoSuchElementException:
+        except WebDriverException:
             try:
-                browser.execute_script("location.reload()")
-                update_activity(browser, state=None)
-
-                following_count = browser.execute_script(
-                    "return window._sharedData.entry_data."
-                    "ProfilePage[0].graphql.user.edge_follow.count"
+                following_count = format_number(
+                    browser.find_element(
+                        By.XPATH,
+                        str(
+                            read_xpath(get_relationship_counts.__name__, "following_count")
+                        ),
+                    ).text
                 )
 
-            except WebDriverException:
+            except NoSuchElementException:
                 try:
-                    topCount_elements = browser.find_elements(
-                        By.XPATH,
-                        read_xpath(
-                            get_relationship_counts.__name__, "topCount_elements"
-                        ),
+                    browser.execute_script("location.reload()")
+                    update_activity(browser, state=None)
+
+                    following_count = browser.execute_script(
+                        "return window._sharedData.entry_data."
+                        "ProfilePage[0].graphql.user.edge_follow.count"
                     )
 
-                    if topCount_elements:
-                        following_count = format_number(topCount_elements[2].text)
-                    else:
-                        logger.info(
-                            "Failed to get following count of '{}'  ~empty "
-                            "list".format(username.encode("utf-8"))
+                except WebDriverException:
+                    try:
+                        topCount_elements = browser.find_elements(
+                            By.XPATH,
+                            read_xpath(
+                                get_relationship_counts.__name__, "topCount_elements"
+                            ),
+                        )
+
+                        if topCount_elements:
+                            following_count = format_number(topCount_elements[2].text)
+                        else:
+                            logger.info(
+                                "Failed to get following count of '{}'  ~empty "
+                                "list".format(username.encode("utf-8"))
+                            )
+                            following_count = None
+
+                    except (NoSuchElementException, IndexError):
+                        logger.error(
+                            "\nError occurred during getting the following count "
+                            "of '{}'\n".format(username.encode("utf-8"))
                         )
                         following_count = None
-
-                except (NoSuchElementException, IndexError):
-                    logger.error(
-                        "\nError occurred during getting the following count "
-                        "of '{}'\n".format(username.encode("utf-8"))
-                    )
-                    following_count = None
 
     Event().profile_data_updated(username, followers_count, following_count)
     return followers_count, following_count
@@ -1718,33 +1729,37 @@ def get_username(browser, track, logger):
                     PostPage[0].graphql.shortcode_media.owner.username"
 
     try:
-        username = browser.execute_script(query)
-
-    except WebDriverException:
+        username = find_user_data(browser=browser, username_or_link='')['username']
+    except:
         try:
-            browser.execute_script("location.reload()")
-            update_activity(browser, state=None)
-
             username = browser.execute_script(query)
 
         except WebDriverException:
-            current_url = get_current_url(browser)
-            logger.info(
-                "Failed to get the username from '{}' page".format(
-                    current_url or "user" if track == "profile" else "post"
+            try:
+                browser.execute_script("location.reload()")
+                update_activity(browser, state=None)
+
+                username = browser.execute_script(query)
+
+            except WebDriverException:
+                current_url = get_current_url(browser)
+                logger.info(
+                    "Failed to get the username from '{}' page".format(
+                        current_url or "user" if track == "profile" else "post"
+                    )
                 )
-            )
-            username = None
+                username = None
 
     # in future add XPATH ways of getting username
 
     return username
 
 
-def find_user_id(browser, track, username, logger):
+def find_user_data(browser, username_or_link, track=None, logger=None):
+    # Para obter user a partir do ID: https://i.instagram.com/api/v1/users/12281817/info
     """Find the user ID from the loaded page"""
 
-    query = None
+    '''query = None
     meta_XP = None
 
     logger.info(
@@ -1793,8 +1808,81 @@ def find_user_id(browser, track, username, logger):
             else:
                 logger.error(failure_message)
                 user_id = None
+    ''' # Tudo comentado por mim
 
-    return user_id
+    def get_x_ig_app_id():
+        for request in browser.requests:
+            if 'x-ig-app-id' in request.headers:
+                return request.headers['x-ig-app-id']
+        # em caso de não encontrar, usar default
+        return '936619743392459'
+
+    def interceptor(request):
+        del request.headers['x-ig-app-id']
+        request.headers['x-ig-app-id'] = get_x_ig_app_id()
+
+    # Get username from a given link (if any)
+    if '/' in username_or_link or username_or_link=='':
+        if '/' in username_or_link:
+            browser.get(username_or_link)
+        
+        # wait till page has loaded
+        start_timer=datetime.datetime.now()
+        while True:
+            r = browser.execute_script('return document.readyState')
+            if r == 'complete' or '@' in browser.title:
+                break
+            if (datetime.datetime.now() - start_timer).seconds > random.randint(15,25):
+                print("readyState taking too long. Stopping now")
+                break
+            
+        username = None
+
+        # if given link is a post
+        media_types = ['/p/','/reel/','/tv/']
+        if any(type in username_or_link for type in media_types):
+            #username = browser.find_element(By.XPATH, '//img[contains(@alt, "\'s profile")]').get_attribute('alt').split('\'s')[0]
+            retrys=0
+            while not username:
+                try:
+                    retrys+=1
+                    username = explicit_wait(browser, "VOEL", ['//img[contains(@alt, "\'s profile")]', "XPath"], logger).get_attribute('alt').split('\'s')[0]
+                except StaleElementReferenceException:
+                    if retrys > 4:
+                        break
+
+        # in case user has a bio name 
+        elif ')' in browser.title:
+            username = browser.title.split('(')[1].split(')')[0]
+            
+        else:
+            # in case user has no bio name
+            username = browser.title.split(' ')[0]
+
+        if '@' in username:
+            username = username.replace('@', '')
+
+    else:
+        username = username_or_link
+
+    if not username: return None
+
+    print('Debug: ',username)
+
+
+    # Set the request interceptor on the driver
+    browser.request_interceptor = interceptor
+
+    # get json data from user profile
+    browser.get(f"https://i.instagram.com/api/v1/users/web_profile_info/?username={username}")
+    
+    content = json.loads(browser.find_element(By.TAG_NAME,'body').text)
+    user_data = content['data']['user']
+
+    # remove interceptor
+    del browser.request_interceptor
+
+    return user_data
 
 
 @contextmanager
@@ -1817,7 +1905,6 @@ def new_tab(browser):
         # return to the host tab
         browser.switch_to.window(browser.window_handles[0])
         sleep(2)
-
 
 def explicit_wait(browser, track, ec_params, logger, timeout=35, notify=True):
     """
@@ -2693,6 +2780,7 @@ def get_additional_data(browser):
         print("\n[Debug] Dados do Código fonte indisponíveis!! (additional_data)\n")
     else:
         print("\n[Debug] Código fonte lido corretamente.\n")
+    
 
     return additional_data
 

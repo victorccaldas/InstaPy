@@ -150,11 +150,26 @@ def get_links_for_location(
         )
 
     except WebDriverException:
-        logger.info(
-            "Failed to get the amount of possible posts in '{}' "
-            "location".format(location)
-        )
-        possible_posts = None
+        try:
+            possible_posts = browser.find_element(
+                By.XPATH, read_xpath(get_links_for_location.__name__, "possible_post")
+            ).text
+            if possible_posts:
+                possible_posts = format_number(possible_posts)
+
+            else:
+                logger.info(
+                    "Failed to get the amount of possible posts in '{}' location  "
+                    "~empty string".format(location)
+                )
+                possible_posts = None
+
+        except NoSuchElementException:
+            logger.info(
+                "Failed to get the amount of possible posts in {} location".format(location)
+            )
+            possible_posts = None
+    
 
     logger.info(
         "desired amount: {}  |  top posts [{}]: {}  |  possible posts: "

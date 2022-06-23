@@ -18,6 +18,7 @@ PyYAML>=3.13
 regex>=2018.11.22
 requests>=2.20.1
 selenium>=3.141.0
+seleniumwire
 setuptools_rust>=0.11.6
 six>=1.11.0
 urllib3>=1.24.1

@@ -17,7 +17,8 @@ from platform import python_version
 from sys import platform
 
 import requests
-from selenium import webdriver
+#from selenium import webdriver
+from seleniumwire import webdriver
 from selenium.webdriver import DesiredCapabilities
 from selenium.webdriver.common.by import By
 
