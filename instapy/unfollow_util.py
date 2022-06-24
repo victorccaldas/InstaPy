@@ -1129,7 +1129,7 @@ def get_given_user_following(
     allfollowing = find_metadata(browser, 
                                 username,
                                 track='user'
-                                )['data']['user']['edge_follow']['count']
+                                )['edge_follow']['count']
 
     '''try:
         # allfollowing = format_number(

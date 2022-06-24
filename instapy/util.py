@@ -89,10 +89,10 @@ def is_private_profile(browser, logger, following=True):
         data = find_metadata(browser=browser, 
                             track='user')
 
-        is_private = data['data']['user']['is_private'] if data else None
+        is_private = data['is_private'] if data else None
         logger.info(
             "Checked if '{}' is private, and it is: '{}'".format(
-                data['data']['user']['username'], is_private
+                data['username'], is_private
             )
         )
     except:
@@ -510,7 +510,7 @@ def getUserData(
         #shared_data = get_shared_data(browser)
         shared_data = find_metadata(browser, track='user')
 
-        if shared_data['data']['user']['username']:
+        if shared_data['username']:
             break
 
     if not shared_data:

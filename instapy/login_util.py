@@ -5,6 +5,7 @@ import os
 import pickle
 import random
 import socket
+import datetime
 
 # import exceptions
 from selenium.common.exceptions import (
@@ -338,7 +339,16 @@ def load_cookie(browser, logger, cookie_file, username):
 
             # force refresh after cookie load or check_authorization() will FAIL
             reload_webpage(browser)
-            sleep(random.randint(6,11))
+            
+            start = datetime.datetime.now()
+            while True:
+                r = browser.execute_script('return document.readyState')
+                if r == 'complete' or r == 'loaded':
+                    break
+                sleep(random.randint(1, 3) + random.random())
+                if (start - datetime.datetime.now()).seconds > 20:
+                    print('[Debug] Page load timeout. Response:', r)
+                    break
 
             # cookie has been LOADED, so the user SHOULD be logged in
             login_state = check_authorization(
