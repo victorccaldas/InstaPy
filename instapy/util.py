@@ -1798,21 +1798,25 @@ def get_username(browser, track, logger):
     return username
 
 
-def find_metadata(browser, username_or_link=None, track=None, logger=None, specific_data=None):
+def find_metadata(browser, username_or_link=None, track=None, specific_data=None, logger=None):
     """
     Find the metadata from the loaded page or a given link
     """
 
-    available_data = {
-        # None == all data
-        'user' : [None, 'all', 'username', 'id'],
-        'media' : [None, 'all'], 
-        'tag' : ['media_count'],
-        'location' : ['media_count'],
-    }
+    # None == all data
+    available_data = { 
+        'user' : {'options':[None, 'username', 'id'],
+                'function': get_user_metadata},
+        'media' : {'options':[None],
+                'function': get_media_metadata}, 
+        'tag' : {'options':[None, 'media_count'],
+                'function': get_hashtag_metadata},
+        #'location' : {'options':[None, 'media_count'],
+        #        'function': get_location_metadata},
+        }
 
     # check if media_or_user_data and specific_data solicited are compatible
-    assert specific_data in available_data[track]
+    assert specific_data in available_data[track]['options']
 
 
     def x_ig_app_id_interceptor(request):
@@ -1840,32 +1844,47 @@ def find_metadata(browser, username_or_link=None, track=None, logger=None, speci
             del request.headers['x-ig-app-id']
             request.headers['x-ig-app-id'] = get_x_ig_app_id()
 
-    def get_media_alternative_id():
+
+    def get_hashtag_metadata(url, specific_data=None):
             '''
-            finds the media key in the current media page
+            gets the hashtag metadata from a given url
             '''
-            for request in browser.requests:
-                if '/api/v1/media/' in str(request):
-                    media_key = str(request).split('/api/v1/media/')[1].split('/')[0]
-                    return media_key
-            return None
 
-    def get_hastag_metadata(tag):
-        url = f'https://i.instagram.com/api/v1/tags/web_info/?tag_name={tag}'
+            if not '/' in url or not url:
+                url = get_current_url(browser)
 
-        browser.request_interceptor = x_ig_app_id_interceptor
-        del browser.requests #clear requests to search faster
-        browser.get(url)
-        del browser.request_interceptor # remove interceptor for future requests
-        content = json.loads(browser.find_element(By.TAG_NAME,'body').text)
-        return content
+            tag = url.split('/')[-1]
+            url = f'https://i.instagram.com/api/v1/tags/web_info/?tag_name={tag}'
+
+            browser.request_interceptor = x_ig_app_id_interceptor
+            del browser.requests #clear requests to search faster
+            browser.get(url)
+            del browser.request_interceptor # remove interceptor for future requests
+            content = json.loads(browser.find_element(By.TAG_NAME,'body').text)
+            
+            if specific_data:
+                return content[specific_data]
+            return content
 
 
-    def get_media_metadata(url=None):
+    def get_media_metadata(url, specific_data=None):
             '''
             gets the metadata of the current media page
             or from given url
             '''
+            if not '/' in url or not url:
+                url = get_current_url(browser)
+
+            def get_media_alternative_id():
+                    '''
+                    finds the media key in the current media page
+                    '''
+                    for request in browser.requests:
+                        if '/api/v1/media/' in str(request):
+                            media_key = str(request).split('/api/v1/media/')[1].split('/')[0]
+                            return media_key
+                    return None
+                    
             if url:
                 del browser.requests #clear requests to search faster
                 browser.get(url)
@@ -1881,14 +1900,19 @@ def find_metadata(browser, username_or_link=None, track=None, logger=None, speci
             browser.get(url)
             del browser.request_interceptor # remove interceptor for future requests
             content = json.loads(browser.find_element(By.TAG_NAME,'body').text)
+
+            if specific_data:
+                return content[specific_data]
+
             return content
 
-    def get_user_metadata(solicitation=None, username_or_link=None):
+
+    def get_user_metadata(username_or_link, specific_data=None):
             '''
             gets a given user's data from it's username, through instagram api
             '''
 
-            if solicitation == 'id':
+            if specific_data == 'id':
                 user_id = None
                 try:
                     user_id = browser.execute_script('location.reload(); return document.querySelector("body").innerHTML.match(/profile_id":"(.*?)"/)[1]')
@@ -1943,7 +1967,10 @@ def find_metadata(browser, username_or_link=None, track=None, logger=None, speci
             else:
                 username = username_or_link
 
-            if not username: return None
+            if not username: 
+                return None
+            elif specific_data == 'username':
+                return username
 
             # Set the request interceptor on the driver
             browser.request_interceptor = x_ig_app_id_interceptor
@@ -1957,10 +1984,15 @@ def find_metadata(browser, username_or_link=None, track=None, logger=None, speci
             
             # extract user data
             content = json.loads(browser.find_element(By.TAG_NAME,'body').text)
-            return content
-            #user_data = content['data']['user']
-            #return user_data
+            user_data = content['data']['user']
+
+            if specific_data:
+                return user_data[specific_data]
+            return user_data
     
+    data = available_data[track]['function'](username_or_link, specific_data)
+    return data
+
     '''
     # Queries for sharedData and additionalData in source code not available anymore!!
 
