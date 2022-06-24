@@ -1821,6 +1821,14 @@ def find_metadata(browser, username_or_link=None, track=None, specific_data=None
                         return ACTUAL_X_IG_APP_ID
                     except NameError: pass
 
+                    del browser.requests #clear requests to search faster
+                    browser.execute_script('location.reload()') # reload current page
+                    for _ in range(7): # wait for the page to load
+                        time.sleep(random.randint(2,5)+random.random())
+                        r = browser.execute_script('return document.readyState')
+                        if r == 'complete' or r == 'loaded':
+                            break
+
                     for request in browser.requests:
                         if 'x-ig-app-id' in request.headers:
                             ACTUAL_X_IG_APP_ID = request.headers['x-ig-app-id']
@@ -1844,8 +1852,12 @@ def find_metadata(browser, username_or_link=None, track=None, specific_data=None
             url = f'https://i.instagram.com/api/v1/tags/web_info/?tag_name={tag}'
 
             browser.request_interceptor = x_ig_app_id_interceptor
-            del browser.requests #clear requests to search faster
             browser.get(url)
+            for _ in range(7): # wait for the page to load
+                time.sleep(random.randint(2,5)+random.random())
+                r = browser.execute_script('return document.readyState')
+                if r == 'complete' or r == 'loaded':
+                    break
             del browser.request_interceptor # remove interceptor for future requests
             content = json.loads(browser.find_element(By.TAG_NAME,'body').text)
             
@@ -1862,21 +1874,25 @@ def find_metadata(browser, username_or_link=None, track=None, specific_data=None
             if not '/' in url or not url:
                 url = get_current_url(browser)
 
-            def get_media_alternative_id():
+            def get_media_alternative_id(browser):
                     '''
                     finds the media key in the current media page
                     '''
+                    for _ in range(7): # wait for the page to load
+                        time.sleep(random.randint(2,5)+random.random())
+                        r = browser.execute_script('return document.readyState')
+                        if r == 'complete' or r == 'loaded':
+                            break
+                        
                     for request in browser.requests:
                         if '/api/v1/media/' in str(request):
                             media_key = str(request).split('/api/v1/media/')[1].split('/')[0]
                             return media_key
                     return None
-                    
-            if url:
-                del browser.requests #clear requests to search faster
-                browser.get(url)
-
-            media_key = get_media_alternative_id()
+            
+            del browser.requests #clear requests to search faster
+            browser.get(url)
+            media_key = get_media_alternative_id(browser)
             if not media_key:
                 print('[Debug] Media key(alterative id) could not be found from network requests')
                 return None
@@ -1885,6 +1901,11 @@ def find_metadata(browser, username_or_link=None, track=None, specific_data=None
             browser.request_interceptor = x_ig_app_id_interceptor
             del browser.requests #clear requests to search faster
             browser.get(url)
+            for _ in range(7): # wait for the page to load
+                time.sleep(random.randint(2,5)+random.random())
+                r = browser.execute_script('return document.readyState')
+                if r == 'complete' or r == 'loaded':
+                    break
             del browser.request_interceptor # remove interceptor for future requests
             content = json.loads(browser.find_element(By.TAG_NAME,'body').text)
 
@@ -1969,6 +1990,13 @@ def find_metadata(browser, username_or_link=None, track=None, specific_data=None
             del browser.requests #clear requests to search faster
             browser.get(f"https://i.instagram.com/api/v1/users/web_profile_info/?username={username}")
 
+            # wait for data to load
+            for _ in range(7): # wait for the page to load
+                time.sleep(random.randint(2,5)+random.random())
+                r = browser.execute_script('return document.readyState')
+                if r == 'complete' or r == 'loaded':
+                    break
+                
             # remove interceptor
             del browser.request_interceptor # remove interceptor for future requests
             
