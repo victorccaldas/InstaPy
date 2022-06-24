@@ -1805,27 +1805,12 @@ def find_metadata(browser, username_or_link=None, track=None, specific_data=None
     Find the metadata from the loaded page or a given link
     """
 
-    # None == all data
-    available_data = { 
-        'user' : {'options':[None, 'username', 'id'],
-                'function': get_user_metadata},
-        'media' : {'options':[None],
-                'function': get_media_metadata}, 
-        'tag' : {'options':[None, 'media_count'],
-                'function': get_hashtag_metadata},
-        #'location' : {'options':[None, 'media_count'],
-        #        'function': get_location_metadata},
-        }
-
-    # check if media_or_user_data and specific_data solicited are compatible
-    assert specific_data in available_data[track]['options']
-
-
     def x_ig_app_id_interceptor(request):
             '''
             intercepts all following requests and changes the x-ig-app-id header
             * requires selenium-wire
             '''
+
             def get_x_ig_app_id():
                     '''
                     finds the x-ig-app-id header value in the current page
@@ -1991,7 +1976,23 @@ def find_metadata(browser, username_or_link=None, track=None, specific_data=None
             if specific_data:
                 return user_data[specific_data]
             return user_data
+
+    # None == all data
+    available_data = { 
+        'user' : {'options':[None, 'username', 'id'],
+                'function': get_user_metadata},
+        'media' : {'options':[None],
+                'function': get_media_metadata}, 
+        'tag' : {'options':[None, 'media_count'],
+                'function': get_hashtag_metadata},
+        #'location' : {'options':[None, 'media_count'],
+        #        'function': get_location_metadata},
+        }
+
+    # check if media_or_user_data and specific_data solicited are compatible
+    assert specific_data in available_data[track]['options']
     
+    # extract data
     data = available_data[track]['function'](username_or_link, specific_data)
     return data
 
