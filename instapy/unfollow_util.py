@@ -37,7 +37,7 @@ from .util import (
     click_visibly,
     delete_line_from_file,
     emergency_exit,
-    find_user_data,
+    find_metadata,
     format_number,
     get_action_delay,
     get_epoch_time_diff,
@@ -688,7 +688,12 @@ def get_users_through_dialog_with_graphql(
     # https://www.instagram.com/<username>/?__a=1'
 
     user_id = None
-    user_id = find_user_data(browser=browser, username_or_link=username)['id']
+    user_id = find_metadata(
+                            browser=browser, 
+                            username_or_link=username,
+                            track='user',
+                            specific_data='id'
+                            )
 
     '''if not user_id:
         try:
@@ -1121,7 +1126,10 @@ def get_given_user_following(
     #  check how many people are following this user.
     #  throw RuntimeWarning if we are 0 people following this user
 
-    allfollowing = find_user_data(browser, username)['edge_follow']['count']
+    allfollowing = find_metadata(browser, 
+                                username,
+                                track='user'
+                                )['data']['user']['edge_follow']['count']
 
     '''try:
         # allfollowing = format_number(
@@ -1558,7 +1566,12 @@ def get_user_id(browser, track, username, logger):
 
     if track != "dialog":  # currently do not get the user ID for follows
         # from 'dialog'
-        user_id = find_user_data(browser, track, username, logger)['id']
+        user_id = find_metadata(browser, 
+                                username, 
+                                logger,
+                                track='user',
+                                specific_data='id'
+                                )
 
     return user_id
 

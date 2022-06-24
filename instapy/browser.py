@@ -312,10 +312,9 @@ class custom_browser(Remote):
         current_url = get_current_url(self)
 
         # stuck on invalid auth
-        auth_method = "activity counts"
         counter = 0
         while True and counter < 10:
-            login_state = check_authorization(self, username, auth_method, logger)
+            login_state = check_authorization(self, username, "activity counts", logger)
             if login_state is False:
                 logger.warning("not logged in")
                 counter += 1

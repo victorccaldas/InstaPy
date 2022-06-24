@@ -20,7 +20,7 @@ from .util import (
     progress_tracker,
     truncate_float,
     web_address_navigator,
-    find_user_data,
+    find_metadata,
 )
 
 
@@ -116,7 +116,11 @@ def get_followers(
         graphql_endpoint + "?query_hash=37479f2b8209594dde7facb0d904896a"
     )
 
-    user_data['id'] = find_user_data(browser=browser, username_or_link=username)['id']
+    user_data['id'] = find_metadata(browser=browser, 
+                                    username_or_link=username, 
+                                    track='user', 
+                                    specific_data='id'
+                                    )
 
     '''try:
         user_data["id"] = browser.execute_script(
@@ -413,7 +417,12 @@ def get_following(
         graphql_endpoint + "?query_hash=58712303d941c6855d4e888c5f0cd22f"
     )
 
-    user_data['id'] = find_user_data(browser=browser, username_or_link=username)['id']
+    user_data['id'] = find_metadata(
+                                    browser=browser, 
+                                    username_or_link=username,
+                                    track='user',
+                                    specific_data='id',
+                                    )
 
     '''try:
         user_data["id"] = browser.execute_script(

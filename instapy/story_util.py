@@ -47,7 +47,7 @@ def get_story_data(browser, elem, action_type, logger, simulate=False):
         except WebDriverException:
             try:
                 reel_id = browser.execute_script(
-                    "return window._sharedData."
+                    "return window._sharedData." # *
                     "entry_data.ProfilePage[0]."
                     "graphql.user.id"
                 )

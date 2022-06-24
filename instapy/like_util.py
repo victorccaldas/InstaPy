@@ -39,6 +39,7 @@ from .util import (
     is_private_profile,
     update_activity,
     web_address_navigator,
+    find_metadata,
 )
 from .xpath import read_xpath
 from .minhas_funcoes import verificar_link
@@ -602,7 +603,10 @@ def check_link(
     web_address_navigator(browser, post_link)
 
     # Check if the Post is Valid/Exists
-    post_page = get_additional_data(browser)
+    #post_page = get_additional_data(browser)
+    post_page = find_metadata(browser=browser, 
+                            username_or_link=post_link,
+                            track='media')
 
     if post_page is None:
         logger.warning("Unavailable Page: {}".format(post_link.encode("utf-8")))
@@ -868,7 +872,10 @@ def get_tags(browser, url):
     # then do not navigate to it again
     web_address_navigator(browser, url)
 
-    additional_data = get_additional_data(browser)
+    #additional_data = get_additional_data(browser)
+    additional_data = find_metadata(browser=browser, 
+                            track='media')
+
     #DEF: 22jan
     image_text = additional_data["items"][0]["caption"]
     image_text = image_text["text"] if image_text else None
@@ -957,7 +964,10 @@ def verify_liking(browser, maximum, minimum, logger):
     """Get the amount of existing existing likes and compare it against maximum
     & minimum values defined by user"""
 
-    post_page = get_additional_data(browser)
+    #post_page = get_additional_data(browser)
+    post_page = find_metadata(browser=browser, 
+                            track='media')
+                            
     #DEF: 22jan
     likes_count = post_page["items"][0]["like_count"]
 

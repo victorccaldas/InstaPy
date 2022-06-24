@@ -10,6 +10,7 @@ import signal
 import sqlite3
 import sys
 import time
+import requests
 from argparse import ArgumentParser
 from contextlib import contextmanager
 from math import ceil, cos
@@ -84,12 +85,14 @@ def is_private_profile(browser, logger, following=True):
     is_private=None
     try:
         #DEF: 22jan function refactored
-        data = get_additional_data(browser)
-        is_private = data["items"][0]
-        is_private = is_private["user"]['is_private'] if is_private else None
+        #data = get_additional_data(browser)
+        data = find_metadata(browser=browser, 
+                            track='user')
+
+        is_private = data['data']['user']['is_private'] if data else None
         logger.info(
             "Checked if '{}' is private, and it is: '{}'".format(
-                data["items"][0]["user"]["username"], is_private
+                data['data']['user']['username'], is_private
             )
         )
     except:
@@ -156,7 +159,10 @@ def validate_username(
     """Check if we can interact with the user"""
     # some features may not provide `username` and in those cases we will
     # get it from post's page.
-    username = find_user_data(browser=browser, username_or_link=username_or_link)['username']
+    username = find_metadata(browser=browser, 
+                            username_or_link=username_or_link,
+                            track='user',
+                            specific_data='username')
     
     '''if "/" in username_or_link:
         link = username_or_link  # if there is a `/` in `username_or_link`,
@@ -501,20 +507,42 @@ def getUserData(
     basequery="no-longer-needed",
 ):
     for _ in range(3):
-        shared_data = get_shared_data(browser)
-        if shared_data:
+        #shared_data = get_shared_data(browser)
+        shared_data = find_metadata(browser, track='user')
+
+        if shared_data['data']['user']['username']:
             break
 
     if not shared_data:
         raise StopIteration("[BLOCK] Dados do self-usuário inacessíveis. (Bloqueio do Insta de acesso a perfis)")
 
+    # try to get data from API first
+    try:
+        if len(query) != len(query.split('.user.')[1]):
+            query = query.split('.user.')[1]
+        else:
+            raise "Invalid query for new data format: {}".format(query)
+
+        query_args = [arg for arg in query.split('.')]
+        desired_data = shared_data
+
+        for i in query_args:
+            desired_data = desired_data[i]
+        data = desired_data
+        return data
+    except:
+        pass
+
     # fetches all data needed
+    # id ??
     get_key = shared_data.get("entry_data").get("ProfilePage")
 
     if get_key:
         data = get_key[0]
     else:
-        data = get_additional_data(browser)
+        #data = get_additional_data(browser)
+        data = find_metadata(browser=browser, 
+                            track='user')
 
     if query.find(".") == -1:
         data = data[query]
@@ -543,7 +571,9 @@ def getMediaData(
     query,
     browser,
 ):
-    additional_data = get_additional_data(browser)
+    #additional_data = get_additional_data(browser)
+    additional_data = find_metadata(browser=browser, 
+                            track='media')
     #DEF: 20jan
     data = additional_data["items"][0]
    
@@ -709,13 +739,20 @@ def get_active_users(browser, username, posts, boundary, logger):
     # check URL of the webpage, if it already is user's profile page,
     # then do not navigate to it again
     web_address_navigator(browser, user_link)
-
+    
+    
     try:
+        data = find_metadata(browser, username, 'user')
+        total_posts = data['edge_owner_to_timeline_media']['count']
+        '''
         total_posts = browser.execute_script(
             "return window._sharedData.entry_data."
             "ProfilePage[0].graphql.user.edge_owner_to_timeline_media.count"
         )
+        
     except WebDriverException:
+        '''
+    except:
         try:
             topCount_elements = browser.find_elements(
                 By.XPATH, read_xpath(get_active_users.__name__, "topCount_elements")
@@ -1214,72 +1251,77 @@ def get_relationship_counts(browser, username, logger):
     web_address_navigator(browser, user_link)
     valid_page = is_page_available(browser, logger)
     
-    user_data = find_user_data(browser=browser, username_or_link=username)
     
     try:
+        user_data = find_metadata(browser=browser, username_or_link=username, track='user')
         followers_count = user_data['edge_followed_by']['count']
+
+        '''followers_count = browser.execute_script(
+            "return window._sharedData.entry_data."
+            "ProfilePage[0].graphql.user.edge_followed_by.count"
+        )
+
+    except WebDriverException:
+        '''
     except:
         try:
-            followers_count = browser.execute_script(
-                "return window._sharedData.entry_data."
-                "ProfilePage[0].graphql.user.edge_followed_by.count"
+            followers_count = format_number(
+                browser.find_element(
+                    By.XPATH,
+                    str(
+                        read_xpath(get_relationship_counts.__name__, "followers_count")
+                    ),
+                ).text
             )
-
-        except WebDriverException:
+        except NoSuchElementException:
             try:
-                followers_count = format_number(
-                    browser.find_element(
-                        By.XPATH,
-                        str(
-                            read_xpath(get_relationship_counts.__name__, "followers_count")
-                        ),
-                    ).text
-                )
-            except NoSuchElementException:
-                try:
-                    browser.execute_script("location.reload()")
-                    update_activity(browser, state=None)
+                browser.execute_script("location.reload()")
+                update_activity(browser, state=None)
 
-                    followers_count = browser.execute_script(
-                        "return window._sharedData.entry_data."
-                        "ProfilePage[0].graphql.user.edge_followed_by.count"
+                followers_count = browser.execute_script(
+                    "return window._sharedData.entry_data."
+                    "ProfilePage[0].graphql.user.edge_followed_by.count"
+                )
+
+            except WebDriverException:
+                try:
+                    topCount_elements = browser.find_elements(
+                        By.XPATH,
+                        read_xpath(
+                            get_relationship_counts.__name__, "topCount_elements"
+                        ),
                     )
 
-                except WebDriverException:
-                    try:
-                        topCount_elements = browser.find_elements(
-                            By.XPATH,
-                            read_xpath(
-                                get_relationship_counts.__name__, "topCount_elements"
-                            ),
-                        )
-
-                        if topCount_elements:
-                            followers_count = format_number(topCount_elements[1].text)
-                        else:
-                            logger.info(
-                                "Failed to get followers count of '{}'  ~empty "
-                                "list".format(username.encode("utf-8"))
-                            )
-                            followers_count = None
-
-                    except NoSuchElementException:
-                        logger.error(
-                            "Error occurred during getting the followers count "
-                            "of '{}'\n".format(username.encode("utf-8"))
+                    if topCount_elements:
+                        followers_count = format_number(topCount_elements[1].text)
+                    else:
+                        logger.info(
+                            "Failed to get followers count of '{}'  ~empty "
+                            "list".format(username.encode("utf-8"))
                         )
                         followers_count = None
+
+                except NoSuchElementException:
+                    logger.error(
+                        "Error occurred during getting the followers count "
+                        "of '{}'\n".format(username.encode("utf-8"))
+                    )
+                    followers_count = None
 
     try:
         followers_count = user_data['edge_follow']['count']
     except:
         try:
-            following_count = browser.execute_script(
+            user_data = find_metadata(browser=browser, username_or_link=username, track='user')
+            followers_count = user_data['edge_follow']['count']
+
+            '''following_count = browser.execute_script(
                 "return window._sharedData.entry_data."
                 "ProfilePage[0].graphql.user.edge_follow.count"
             )
 
-        except WebDriverException:
+        except WebDriverException:'''
+        except:
             try:
                 following_count = format_number(
                     browser.find_element(
@@ -1614,8 +1656,7 @@ def emergency_exit(browser, username, logger):
         return True, "not connected"
 
     # check if the user is logged in
-    auth_method = "activity counts"
-    login_state = check_authorization(browser, username, auth_method, logger)
+    login_state = check_authorization(browser, username, "activity counts", logger)
     if login_state is False:
         return True, "not logged in"
 
@@ -1720,16 +1761,18 @@ def get_username(browser, track, logger):
 
     query = None
 
-    if track == "profile":
+    '''if track == "profile":
         query = "return window._sharedData.entry_data. \
                     ProfilePage[0].graphql.user.username"
 
     elif track == "post":
         query = "return window._sharedData.entry_data. \
-                    PostPage[0].graphql.shortcode_media.owner.username"
+                    PostPage[0].graphql.shortcode_media.owner.username"'''
 
     try:
-        username = find_user_data(browser=browser, username_or_link='')['username']
+        username = find_metadata(browser=browser,
+                                track='user',
+                                specific_data='username')
     except:
         try:
             username = browser.execute_script(query)
@@ -1755,11 +1798,173 @@ def get_username(browser, track, logger):
     return username
 
 
-def find_user_data(browser, username_or_link, track=None, logger=None):
-    # Para obter user a partir do ID: https://i.instagram.com/api/v1/users/12281817/info
-    """Find the user ID from the loaded page"""
+def find_metadata(browser, username_or_link=None, track=None, logger=None, specific_data=None):
+    """
+    Find the metadata from the loaded page or a given link
+    """
 
-    '''query = None
+    available_data = {
+        # None == all data
+        'user' : [None, 'all', 'username', 'id'],
+        'media' : [None, 'all'], 
+        'tag' : ['media_count'],
+        'location' : ['media_count'],
+    }
+
+    # check if media_or_user_data and specific_data solicited are compatible
+    assert specific_data in available_data[track]
+
+
+    def x_ig_app_id_interceptor(request):
+            '''
+            intercepts all following requests and changes the x-ig-app-id header
+            * requires selenium-wire
+            '''
+            def get_x_ig_app_id():
+                    '''
+                    finds the x-ig-app-id header value in the current page
+                    '''
+                    global ACTUAL_X_IG_APP_ID
+
+                    try:
+                        return ACTUAL_X_IG_APP_ID
+                    except NameError: pass
+
+                    for request in browser.requests:
+                        if 'x-ig-app-id' in request.headers:
+                            ACTUAL_X_IG_APP_ID = request.headers['x-ig-app-id']
+                            return ACTUAL_X_IG_APP_ID
+
+                    return '936619743392459' # default value at the time of writing
+                    
+            del request.headers['x-ig-app-id']
+            request.headers['x-ig-app-id'] = get_x_ig_app_id()
+
+    def get_media_alternative_id():
+            '''
+            finds the media key in the current media page
+            '''
+            for request in browser.requests:
+                if '/api/v1/media/' in str(request):
+                    media_key = str(request).split('/api/v1/media/')[1].split('/')[0]
+                    return media_key
+            return None
+
+    def get_hastag_metadata(tag):
+        url = f'https://i.instagram.com/api/v1/tags/web_info/?tag_name={tag}'
+
+        browser.request_interceptor = x_ig_app_id_interceptor
+        del browser.requests #clear requests to search faster
+        browser.get(url)
+        del browser.request_interceptor # remove interceptor for future requests
+        content = json.loads(browser.find_element(By.TAG_NAME,'body').text)
+        return content
+
+
+    def get_media_metadata(url=None):
+            '''
+            gets the metadata of the current media page
+            or from given url
+            '''
+            if url:
+                del browser.requests #clear requests to search faster
+                browser.get(url)
+
+            media_key = get_media_alternative_id()
+            if not media_key:
+                print('[Debug] Media key(alterative id) could not be found from network requests')
+                return None
+
+            url = f'https://i.instagram.com/api/v1/media/{media_key}/info/'
+            browser.request_interceptor = x_ig_app_id_interceptor
+            del browser.requests #clear requests to search faster
+            browser.get(url)
+            del browser.request_interceptor # remove interceptor for future requests
+            content = json.loads(browser.find_element(By.TAG_NAME,'body').text)
+            return content
+
+    def get_user_metadata(solicitation=None, username_or_link=None):
+            '''
+            gets a given user's data from it's username, through instagram api
+            '''
+
+            if solicitation == 'id':
+                user_id = None
+                try:
+                    user_id = browser.execute_script('location.reload(); return document.querySelector("body").innerHTML.match(/profile_id":"(.*?)"/)[1]')
+                    return user_id
+                except:
+                    pass
+
+            # Get username from a given link (if any)
+            if '/' in username_or_link:
+                try:
+                    browser.get(username_or_link)
+                except:
+                    browser.execute_script('location.reload()')
+
+            if '/' in username_or_link or not username_or_link:
+                # wait till page has loaded
+                start_timer=datetime.datetime.now()
+                while True:
+                    r = browser.execute_script('return document.readyState')
+                    if r == 'complete' or '@' in browser.title:
+                        break
+                    if (datetime.datetime.now() - start_timer).seconds > random.randint(15,25):
+                        print("readyState taking too long. Stopping now")
+                        break
+                    
+                username = None
+
+                # if given link is a post
+                media_types = ['/p/','/reel/','/tv/']
+                if any(type in username_or_link for type in media_types):
+                    #username = browser.find_element(By.XPATH, '//img[contains(@alt, "\'s profile")]').get_attribute('alt').split('\'s')[0]
+                    retrys=0
+                    while not username:
+                        try:
+                            retrys+=1
+                            username = explicit_wait(browser, "VOEL", ['//img[contains(@alt, "\'s profile")]', "XPath"], logger).get_attribute('alt').split('\'s')[0]
+                        except StaleElementReferenceException:
+                            if retrys > 4:
+                                break
+
+                # in case user has a bio name 
+                elif ')' in browser.title:
+                    username = browser.title.split('(')[1].split(')')[0]
+                    
+                else:
+                    # in case user has no bio name
+                    username = browser.title.split(' ')[0]
+
+                if '@' in username:
+                    username = username.replace('@', '')
+
+            else:
+                username = username_or_link
+
+            if not username: return None
+
+            # Set the request interceptor on the driver
+            browser.request_interceptor = x_ig_app_id_interceptor
+
+            # get json data from user profile
+            del browser.requests #clear requests to search faster
+            browser.get(f"https://i.instagram.com/api/v1/users/web_profile_info/?username={username}")
+
+            # remove interceptor
+            del browser.request_interceptor # remove interceptor for future requests
+            
+            # extract user data
+            content = json.loads(browser.find_element(By.TAG_NAME,'body').text)
+            return content
+            #user_data = content['data']['user']
+            #return user_data
+    
+    '''
+    # Queries for sharedData and additionalData in source code not available anymore!!
+
+    query = None
     meta_XP = None
 
     logger.info(
@@ -1809,81 +2014,6 @@ def find_user_data(browser, username_or_link, track=None, logger=None):
                 logger.error(failure_message)
                 user_id = None
     ''' # Tudo comentado por mim
-
-    def get_x_ig_app_id():
-        for request in browser.requests:
-            if 'x-ig-app-id' in request.headers:
-                return request.headers['x-ig-app-id']
-        # em caso de não encontrar, usar default
-        return '936619743392459'
-
-    def interceptor(request):
-        del request.headers['x-ig-app-id']
-        request.headers['x-ig-app-id'] = get_x_ig_app_id()
-
-    # Get username from a given link (if any)
-    if '/' in username_or_link or username_or_link=='':
-        if '/' in username_or_link:
-            browser.get(username_or_link)
-        
-        # wait till page has loaded
-        start_timer=datetime.datetime.now()
-        while True:
-            r = browser.execute_script('return document.readyState')
-            if r == 'complete' or '@' in browser.title:
-                break
-            if (datetime.datetime.now() - start_timer).seconds > random.randint(15,25):
-                print("readyState taking too long. Stopping now")
-                break
-            
-        username = None
-
-        # if given link is a post
-        media_types = ['/p/','/reel/','/tv/']
-        if any(type in username_or_link for type in media_types):
-            #username = browser.find_element(By.XPATH, '//img[contains(@alt, "\'s profile")]').get_attribute('alt').split('\'s')[0]
-            retrys=0
-            while not username:
-                try:
-                    retrys+=1
-                    username = explicit_wait(browser, "VOEL", ['//img[contains(@alt, "\'s profile")]', "XPath"], logger).get_attribute('alt').split('\'s')[0]
-                except StaleElementReferenceException:
-                    if retrys > 4:
-                        break
-
-        # in case user has a bio name 
-        elif ')' in browser.title:
-            username = browser.title.split('(')[1].split(')')[0]
-            
-        else:
-            # in case user has no bio name
-            username = browser.title.split(' ')[0]
-
-        if '@' in username:
-            username = username.replace('@', '')
-
-    else:
-        username = username_or_link
-
-    if not username: return None
-
-    print('Debug: ',username)
-
-
-    # Set the request interceptor on the driver
-    browser.request_interceptor = interceptor
-
-    # get json data from user profile
-    browser.get(f"https://i.instagram.com/api/v1/users/web_profile_info/?username={username}")
-    
-    content = json.loads(browser.find_element(By.TAG_NAME,'body').text)
-    user_data = content['data']['user']
-
-    # remove interceptor
-    del browser.request_interceptor
-
-    return user_data
-
 
 @contextmanager
 def new_tab(browser):
@@ -1993,6 +2123,18 @@ def get_current_url(browser):
 def get_username_from_id(browser, user_id, logger):
     """Convert user ID to username"""
     # method using graphql 'Account media' endpoint
+
+    #method using private API
+    logger.info("Trying to find the username from the given user ID by a quick API call")
+
+    req = requests.get(u"https://i.instagram.com/api/v1/users/{}/info/".format(user_id))
+    
+    if req:
+        data = json.loads(req.text)
+        if data["user"]:
+            username = data["user"]["username"]
+            return username
+
     logger.info("Trying to find the username from the given user ID by loading a post")
 
     query_hash = "42323d64886122307be10013ad2dcc44"  # earlier-
@@ -2039,18 +2181,7 @@ def get_username_from_id(browser, user_id, logger):
         )
         return None
 
-    """  method using private API
-    #logger.info("Trying to find the username from the given user ID by a
-    quick API call")
-
-    #req = requests.get(u"https://i.instagram.com/api/v1/users/{}/info/"
-    #                   .format(user_id))
-    #if req:
-    #    data = json.loads(req.text)
-    #    if data["user"]:
-    #        username = data["user"]["username"]
-    #        return username
-    """
+    
 
     """ Having a BUG (random log-outs) with the method below, use it only in
     the external sessions
@@ -2792,6 +2923,8 @@ def get_shared_data(browser):
 
     :param browser: The selenium webdriver instance
     :return shared_data: Json data from window._sharedData extracted from page source
+
+    DESUTILIZADO POR MIM
     """
     shared_data = None
     soup = BeautifulSoup(browser.page_source, "html.parser")
