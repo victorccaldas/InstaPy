@@ -1908,13 +1908,13 @@ def find_metadata(browser, username_or_link=None, track=None, specific_data=None
                     pass
 
             # Get username from a given link (if any)
-            if '/' in username_or_link:
+            if username_or_link and '/' in username_or_link:
                 try:
                     browser.get(username_or_link)
                 except:
                     browser.execute_script('location.reload()')
 
-            if '/' in username_or_link or not username_or_link:
+            if not username_or_link or '/' in username_or_link:
                 # wait till page has loaded
                 start_timer=datetime.datetime.now()
                 while True:
