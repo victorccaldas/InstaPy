@@ -346,7 +346,7 @@ def load_cookie(browser, logger, cookie_file, username):
                 if r == 'complete' or r == 'loaded':
                     break
                 sleep(random.randint(1, 3) + random.random())
-                if (start - datetime.datetime.now()).seconds > 20:
+                if (datetime.datetime.now() - start).seconds > 20:
                     print('[Debug] Page load timeout. Response:', r)
                     break
 
