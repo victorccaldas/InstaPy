@@ -338,7 +338,7 @@ def load_cookie(browser, logger, cookie_file, username):
 
             # force refresh after cookie load or check_authorization() will FAIL
             reload_webpage(browser)
-            sleep(4)
+            sleep(random.randint(6,11))
 
             # cookie has been LOADED, so the user SHOULD be logged in
             login_state = check_authorization(

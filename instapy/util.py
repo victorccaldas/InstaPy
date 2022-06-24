@@ -1906,6 +1906,9 @@ def find_metadata(browser, username_or_link=None, track=None, specific_data=None
                     return user_id
                 except:
                     pass
+            
+            if not username_or_link:
+                username_or_link = get_current_url(browser)
 
             # Get username from a given link (if any)
             if username_or_link and '/' in username_or_link:
