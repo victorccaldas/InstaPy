@@ -1309,11 +1309,13 @@ def get_relationship_counts(browser, username, logger):
                     followers_count = None
 
     try:
-        followers_count = user_data['edge_follow']['count']
+        following_count = user_data['edge_follow']['count']
     except:
         try:
             user_data = find_metadata(browser=browser, username_or_link=username, track='user')
-            followers_count = user_data['edge_follow']['count']
+            following_count = user_data['edge_follow']['count']
+            followers_count = user_data['edge_followed_by']['count']
+
 
             '''following_count = browser.execute_script(
                 "return window._sharedData.entry_data."
