@@ -86,8 +86,7 @@ def is_private_profile(browser, logger, following=True):
     try:
         #DEF: 22jan function refactored
         #data = get_additional_data(browser)
-        data = find_metadata(browser=browser, 
-                            track='user')
+        data = find_metadata_new(browser=browser, query='is_private')
 
         is_private = data['is_private'] if data else None
         logger.info(
@@ -350,7 +349,7 @@ def validate_username(
         # if you are interested in relationship number of posts boundaries
         try:
             number_of_posts = getUserData(
-                "graphql.user.edge_owner_to_timeline_media.count", browser
+                "data.user.edge_owner_to_timeline_media.count", browser
             )
 
             if max_posts:
@@ -379,7 +378,7 @@ def validate_username(
     # skip private
     if skip_private:
         try:
-            is_private = getUserData("graphql.user.is_private", browser)
+            is_private = getUserData("data.user.is_private", browser)
 
             if is_private and (random.randint(0, 100) <= skip_private_percentage):
                 return False, "{} is private account, by default skip\n".format(
@@ -392,7 +391,7 @@ def validate_username(
     # skip public
     if skip_public:
         try:
-            is_public = not getUserData("graphql.user.is_private", browser)
+            is_public = not getUserData("data.user.is_private", browser)
 
             if is_public and (random.randint(0, 100) <= skip_public_percentage):
                 return (
@@ -408,7 +407,7 @@ def validate_username(
     # skip no profile pic
     if skip_no_profile_pic:
         try:
-            profile_pic = getUserData("graphql.user.profile_pic_url", browser)
+            profile_pic = getUserData("data.user.profile_pic_url", browser)
         except WebDriverException:
             logger.error("~cannot get the post profile pic url")
             return False, "--> Sorry, couldn't get if user profile pic url\n"
@@ -423,7 +422,7 @@ def validate_username(
         # if is business account skip under conditions
         try:
             is_business_account = getUserData(
-                "graphql.user.is_business_account", browser
+                "data.user.is_business_account", browser
             )
         except WebDriverException:
             logger.error("~cannot get if user has business account active")
@@ -440,7 +439,7 @@ def validate_username(
 
         if is_business_account:
             try:
-                category = getUserData("graphql.user.business_category_name", browser)
+                category = getUserData("data.user.business_category_name", browser)
             except WebDriverException:
                 logger.error("~cannot get category name for user")
                 return False, "--> Sorry, couldn't get category name for user\n"
@@ -479,7 +478,7 @@ def validate_username(
 
         # if contain stop words then skip
         try:
-            profile_bio = getUserData("graphql.user.biography", browser).lower()
+            profile_bio = getUserData("data.user.biography", browser).lower()
         except WebDriverException:
             logger.error("~cannot read '{}' bio".format(username))
             return False, "--> Sorry, couldn't get get user bio account active\n"
@@ -571,27 +570,44 @@ def getMediaData(
     query,
     browser,
 ):
-    #additional_data = get_additional_data(browser)
-    additional_data = find_metadata(browser=browser, 
-                            track='media')
-    #DEF: 20jan
-    data = additional_data["items"][0]
-   
-    #todo: remove rewrite query by modifing call to getMediaData functions in other files
-    if query=="comments_disabled": query="comment_likes_enabled"
-    if query=="edge_media_to_parent_comment": query="comments"
-    if query=="edge_media_to_parent_comment.count": query="comment_count"
-    if query=="edge_media_preview_comment": query="preview_comments"
-    if query=="edge_media_preview_comment.count": query="comment_count"
+    global global_query, data
+    global_query =
+    try: # Catch os erros e facilitar debug
 
-    if query.find(".") == -1:
-        data = data[query]
-    else:
-        subobjects = query.split(".")
-        for subobject in subobjects:
-            data = data[subobject]
+        if 'edge_media_to_caption' in query: 
+            search_query = 'device_timestamp'
 
-    return data
+        additional_data = find_metadata_new(browser, 
+                                    search_query=search_query, 
+                                    #full_query=query, 
+                                    track='media')
+
+        '''additional_data = find_metadata(browser=browser, 
+                                track='media')'''
+        #DEF: 20jan
+        data = additional_data["items"][0]
+        
+        #todo: remove rewrite query by modifing call to getMediaData functions in other files
+        if query=="comments_disabled": query="comment_likes_enabled"
+        if query=="edge_media_to_parent_comment": query="comments"
+        if query=="edge_media_to_parent_comment.count": query="comment_count"
+        if query=="edge_media_preview_comment": query="preview_comments"
+        if query=="edge_media_preview_comment.count": query="comment_count"
+
+        if query.find(".") == -1:
+            data = data[query]
+        else:
+            subobjects = query.split(".")
+            for subobject in subobjects:
+                data = data[subobject]
+
+        return data
+
+    except Exception as e:
+        print("Erro")
+        print('Query:',query)
+        print("Data:",data)
+        raise e
 
 
 def update_activity(
@@ -744,14 +760,7 @@ def get_active_users(browser, username, posts, boundary, logger):
     try:
         data = find_metadata(browser, username, 'user')
         total_posts = data['edge_owner_to_timeline_media']['count']
-        '''
-        total_posts = browser.execute_script(
-            "return window._sharedData.entry_data."
-            "ProfilePage[0].graphql.user.edge_owner_to_timeline_media.count"
-        )
-        
-    except WebDriverException:
-        '''
+
     except:
         try:
             topCount_elements = browser.find_elements(
@@ -1218,7 +1227,7 @@ def get_number_of_posts(browser):
     """Get the number of posts from the profile screen"""
     try:
         num_of_posts = getUserData(
-            "graphql.user.edge_owner_to_timeline_media.count", browser
+            "data.user.edge_owner_to_timeline_media.count", browser
         )
     except WebDriverException:
         try:
@@ -1258,7 +1267,7 @@ def get_relationship_counts(browser, username, logger):
 
         '''followers_count = browser.execute_script(
             "return window._sharedData.entry_data."
-            "ProfilePage[0].graphql.user.edge_followed_by.count"
+            "ProfilePage[0].data.user.edge_followed_by.count"
         )
 
     except WebDriverException:
@@ -1280,7 +1289,7 @@ def get_relationship_counts(browser, username, logger):
 
                 followers_count = browser.execute_script(
                     "return window._sharedData.entry_data."
-                    "ProfilePage[0].graphql.user.edge_followed_by.count"
+                    "ProfilePage[0].data.user.edge_followed_by.count"
                 )
 
             except WebDriverException:
@@ -1319,7 +1328,7 @@ def get_relationship_counts(browser, username, logger):
 
             '''following_count = browser.execute_script(
                 "return window._sharedData.entry_data."
-                "ProfilePage[0].graphql.user.edge_follow.count"
+                "ProfilePage[0].data.user.edge_follow.count"
             )
 
         except WebDriverException:'''
@@ -1341,7 +1350,7 @@ def get_relationship_counts(browser, username, logger):
 
                     following_count = browser.execute_script(
                         "return window._sharedData.entry_data."
-                        "ProfilePage[0].graphql.user.edge_follow.count"
+                        "ProfilePage[0].data.user.edge_follow.count"
                     )
 
                 except WebDriverException:
@@ -1765,7 +1774,7 @@ def get_username(browser, track, logger):
 
     '''if track == "profile":
         query = "return window._sharedData.entry_data. \
-                    ProfilePage[0].graphql.user.username"
+                    ProfilePage[0].data.user.username"
 
     elif track == "post":
         query = "return window._sharedData.entry_data. \
@@ -1798,6 +1807,108 @@ def get_username(browser, track, logger):
     # in future add XPATH ways of getting username
 
     return username
+
+
+def find_metadata_new(browser, track='', search_query='', full_query=''):
+    '''
+    driver: webdriver instance
+    full_query: the whole path to the wanted info
+    search_query: string to search for on requests' bodys
+    # track: user, media, location or hashtag # Testar e implementar
+    '''
+    global full_data, req, matches # debug
+
+    search_url = ''
+    if track:
+        match track:
+            case 'hashtag':
+                search_url = 'https://i.instagram.com/api/v1/tags/web_info/?tag_name='
+            case 'media':
+                search_url = 'https://i.instagram.com/api/v1/media/'
+            case 'user':
+                search_url = 'https://i.instagram.com/api/v1/users/web_profile_info/?username='
+            case 'location':
+                ...
+
+    query_nests = full_query.split('.')
+
+    full_data = data = ''
+    matches = []
+    found = False
+    start = datetime.datetime.now()
+    for r in browser.requests[::-1]:
+        try:
+            resp_content = r.response.body.decode()
+            if search_query:
+                if search_query in resp_content:
+                    matches.append(r)
+                    found = True
+                
+            elif search_url and search_url in r.url:
+                # Só procura pelo url caso não tenha search_query,
+                # pois a busca pelo url é menos garantida de encontrar o resultado.
+                    # Motivo: tem multiplas requests pra um unico link e só 1 deles tem os 
+                    # dados necessários, portanto há risco.
+                found = True
+
+        except: 
+            continue
+
+        if found:
+            req = r
+            try:
+                full_data = data = json.loads(resp_content)
+            except:
+                try:
+                    # sem decode
+                    full_data = data = json.loads(r.response.body) 
+                except:
+                    found = False
+                    continue
+
+            if len(query_nests) > 1:
+                for q in query_nests:
+                    try: q = int(q)
+                    except: pass
+                    
+                    try:
+                        data = data[q]
+                    except Exception as e:
+                        #print("Exception:", e)
+                        #print("full query: ", full_query)
+                        found = False
+                        break
+                if not found: continue
+            break
+            
+
+        if (datetime.datetime.now() - start).seconds > 30:
+            print("Tempo excedido")
+            break
+
+    if data == '': return None, full_data
+
+    browser.requests.clear()
+    return found, data
+
+if __name__ == '__main__':
+    print("DEBUGANDO !!")
+    import datetime
+    import time
+    import random as rd
+    import json
+
+    driver.requests.clear()
+    driver.get('https://www.instagram.com/p/CilbMIGJXUA/')
+    time.sleep(rd.randint(5,9))
+
+    full_query = 'data.items.0.caption.text'
+    search_query = 'device_timestamp'
+    track = 'media'
+
+    result, data = find_metadata_new(driver, search_query=search_query, full_query=full_query, track=track)
+    print("Found: ", result)
+    print(f"{full_query} : {data}")
 
 
 def find_metadata(browser, username_or_link=None, track=None, specific_data=None, logger=None):
@@ -2025,6 +2136,8 @@ def find_metadata(browser, username_or_link=None, track=None, specific_data=None
     
     # extract data
     data = available_data[track]['function'](username_or_link, specific_data)
+
+
     return data
 
     '''
@@ -2037,10 +2150,10 @@ def find_metadata(browser, username_or_link=None, track=None, specific_data=None
         "Attempting to find user ID: Track: {}, Username {}".format(track, username)
     )
     if track in ["dialog", "profile"]:
-        query = "return window.__additionalData[Object.keys(window.__additionalData)[0]].data.graphql.user.id"
+        query = "return window.__additionalData[Object.keys(window.__additionalData)[0]].data.user.id"
 
     elif track == "post":
-        query = "return window._sharedData.entry_data.ProfilePage[0].graphql.user.id"
+        query = "return window._sharedData.entry_data.ProfilePage[0].data.user.id"
         meta_XP = read_xpath(find_user_id.__name__, "meta_XP")
 
     failure_message = "Failed to get the user ID of '{}' from {} page!".format(
@@ -2056,7 +2169,7 @@ def find_metadata(browser, username_or_link=None, track=None, specific_data=None
             update_activity(browser, state=None)
 
             user_id = browser.execute_script(
-                "return window._sharedData.entry_data.ProfilePage[0].graphql.user.id"
+                "return window._sharedData.entry_data.ProfilePage[0].data.user.id"
             )
 
         except WebDriverException:
@@ -2557,7 +2670,7 @@ def save_account_progress(browser, username, logger):
     followers, following = get_relationship_counts(browser, username, logger)
 
     # save profile total posts
-    posts = getUserData("graphql.user.edge_owner_to_timeline_media.count", browser)
+    posts = getUserData("data.user.edge_owner_to_timeline_media.count", browser)
 
     try:
         # DB instance
@@ -2600,7 +2713,7 @@ def is_follow_me(browser, person=None):
         user_link = "https://www.instagram.com/{}/".format(person)
         web_address_navigator(browser, user_link)
 
-    return getUserData("graphql.user.follows_viewer", browser)
+    return getUserData("data.user.follows_viewer", browser)
 
 
 def get_users_from_dialog(old_data, dialog, logger):

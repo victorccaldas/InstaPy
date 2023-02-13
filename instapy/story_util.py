@@ -38,7 +38,7 @@ def get_story_data(browser, elem, action_type, logger, simulate=False):
         
         try:
             reel_id = browser.execute_script(
-                "return window.__additionalData[Object.keys(window.__additionalData)[0]].data.graphql.user.id"
+                "return window.__additionalData[Object.keys(window.__additionalData)[0]].data.user.id"
             )
             # correct formating for elem_id
             elem_id = '"' + reel_id + '"'
@@ -49,7 +49,7 @@ def get_story_data(browser, elem, action_type, logger, simulate=False):
                 reel_id = browser.execute_script(
                     "return window._sharedData." # *
                     "entry_data.ProfilePage[0]."
-                    "graphql.user.id"
+                    "data.user.id"
                 )
                 # correct formatting for elem_id
                 elem_id = '"' + reel_id + '"'

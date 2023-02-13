@@ -190,12 +190,12 @@ def verify_mandatory_words(
 ):
     if len(mand_words) > 0 or isinstance(comments[0], dict):
         try:
-            post_desc = getMediaData(
-                "edge_media_to_caption.edges.0.node.text", browser
+            post_description = getMediaData(
+                "items.0.caption.text", browser
             ).lower()
 
         except Exception:
-            post_desc = None
+            post_description = None
 
         try:
             first_comment = getMediaData(
@@ -205,12 +205,12 @@ def verify_mandatory_words(
         except Exception:
             first_comment = None
 
-        if post_desc is None and first_comment is None:
+        if post_description is None and first_comment is None:
             return False, [], "couldn't get post description and comments"
 
         text = (
-            post_desc
-            if post_desc is not None
+            post_description
+            if post_description is not None
             else "" + " " + first_comment
             if first_comment is not None
             else ""

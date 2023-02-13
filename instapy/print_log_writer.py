@@ -18,7 +18,7 @@ def log_follower_num(browser, username, logfolder):
     user_link = "https://www.instagram.com/{}".format(username)
     web_address_navigator(browser, user_link)
 
-    followed_by = getUserData("graphql.user.edge_followed_by.count", browser)
+    followed_by = getUserData("data.user.edge_followed_by.count", browser)
 
     with open("{}followerNum.txt".format(logfolder), "a") as numFile:
         numFile.write("{:%Y-%m-%d %H:%M} {}\n".format(datetime.now(), followed_by or 0))
@@ -32,7 +32,7 @@ def log_following_num(browser, username, logfolder):
     user_link = "https://www.instagram.com/{}".format(username)
     web_address_navigator(browser, user_link)
 
-    following_num = getUserData("graphql.user.edge_follow.count", browser)
+    following_num = getUserData("data.user.edge_follow.count", browser)
 
     with open("{}followingNum.txt".format(logfolder), "a") as numFile:
         numFile.write(

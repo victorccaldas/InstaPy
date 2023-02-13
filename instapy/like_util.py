@@ -39,7 +39,7 @@ from .util import (
     is_private_profile,
     update_activity,
     web_address_navigator,
-    find_metadata,
+    find_metadata_new,
 )
 from .xpath import read_xpath
 from .minhas_funcoes import verificar_link
@@ -604,9 +604,16 @@ def check_link(
 
     # Check if the Post is Valid/Exists
     #post_page = get_additional_data(browser)
-    post_page = find_metadata(browser=browser, 
+    
+
+    post_page = find_metadata_new(browser, 
+                    search_query='device_timestamp', 
+                    #full_query='items.0.caption.text', 
+                    track='media')
+                    
+    '''post_page = find_metadata(browser=browser, 
                             username_or_link=post_link,
-                            track='media')
+                            track='media')'''
 
     if post_page is None:
         logger.warning("Unavailable Page: {}".format(post_link.encode("utf-8")))

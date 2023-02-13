@@ -698,13 +698,13 @@ def get_users_through_dialog_with_graphql(
     '''if not user_id:
         try:
             user_id = browser.execute_script(
-                "return window.__additionalData[Object.keys(window.__additionalData)[0]].data.graphql.user.id"
+                "return window.__additionalData[Object.keys(window.__additionalData)[0]].data.user.id"
             )
             print("[debug] user_id 1")
         except WebDriverException:
             try:
                 user_id = browser.execute_script(
-                    "return window._sharedData.entry_data.ProfilePage[0].graphql.user.id"
+                    "return window._sharedData.entry_data.ProfilePage[0].data.user.id"
                 )
                 print("[debug] user_id 2")
 
@@ -1144,7 +1144,7 @@ def get_given_user_following(
         try:
             allfollowing = browser.execute_script(
                 "return window.__additionalData[Object.keys(window.__additionalData)[0]].data."
-                "graphql.user.edge_follow.count"
+                "data.user.edge_follow.count"
             )
 
         except WebDriverException:
@@ -1155,7 +1155,7 @@ def get_given_user_following(
                 allfollowing = browser.execute_script(
                     "return window._sharedData."
                     "entry_data.ProfilePage[0]."
-                    "graphql.user.edge_follow.count"
+                    "data.user.edge_follow.count"
                 )
 
             except WebDriverException:

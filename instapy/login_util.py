@@ -593,7 +593,7 @@ def login_user(
             pass
 
         # se pedir pra confirmar o numero de telefone
-        '''try:
+        try:
             browser.find_element(
                 By.XPATH, read_xpath(login_user.__name__, "update_phone_number")
             )
@@ -606,7 +606,7 @@ def login_user(
             )
             bypass_confirmation_code(browser, logger, logfolder, security_code_to_phone)
         except NoSuchElementException:
-            pass'''
+            pass
 
         # try to initiate security code challenge
         try:
